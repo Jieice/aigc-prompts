@@ -3,512 +3,359 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>论文降AIGC神器 - 两轮提示词方案</title>
+<title>论文降AIGC - 两轮改写方案</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--bg:#0f0f13;--card:#1a1a24;--border:#2a2a3a;--accent:#6c5ce7;--accent2:#a29bfe;--text:#e0e0e0;--text2:#888;--success:#00b894;--warn:#fdcb6e;--danger:#e17055}
-body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;line-height:1.8;min-height:100vh}
-.hero{text-align:center;padding:60px 20px 40px;background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);border-bottom:1px solid var(--border)}
-.hero h1{font-size:2.4em;background:linear-gradient(90deg,var(--accent),var(--accent2),#fd79a8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:12px}
-.hero p{color:var(--text2);font-size:1.1em;max-width:600px;margin:0 auto}
-.hero .badge{display:inline-block;background:var(--accent);color:#fff;padding:4px 14px;border-radius:20px;font-size:.85em;margin-top:16px}
-.container{max-width:900px;margin:0 auto;padding:30px 20px}
-.tabs{display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap}
-.tab{padding:10px 22px;border:1px solid var(--border);border-radius:8px;cursor:pointer;background:var(--card);color:var(--text2);transition:all .2s;font-size:.95em}
-.tab:hover{border-color:var(--accent);color:var(--text)}
-.tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
-.panel{display:none}
-.panel.active{display:block}
-.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:28px;margin-bottom:20px;position:relative}
-.card h2{font-size:1.4em;margin-bottom:8px;color:var(--accent2)}
-.card h3{font-size:1.15em;margin:16px 0 8px;color:var(--accent2)}
-.card p{color:var(--text2);margin-bottom:12px}
-.card ul{padding-left:20px;color:var(--text2);margin-bottom:12px}
-.card li{margin-bottom:4px}
-.prompt-box{background:#12121a;border:1px solid var(--border);border-radius:8px;padding:20px;margin:12px 0;position:relative;white-space:pre-wrap;word-break:break-word;font-size:.92em;line-height:1.9;max-height:500px;overflow-y:auto;color:#c0c0c0}
-.prompt-box::-webkit-scrollbar{width:6px}
-.prompt-box::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
-.copy-btn{position:absolute;top:12px;right:12px;padding:6px 16px;background:var(--accent);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:.85em;transition:all .2s;z-index:2}
-.copy-btn:hover{background:var(--accent2)}
-.copy-btn.copied{background:var(--success)}
-.flow{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;margin:20px 0;padding:20px;background:rgba(108,92,231,.08);border-radius:10px}
-.flow-step{text-align:center;padding:12px 18px;background:var(--card);border:1px solid var(--border);border-radius:8px;min-width:100px}
-.flow-step .num{font-size:1.8em;color:var(--accent);font-weight:700}
-.flow-step .label{font-size:.85em;color:var(--text2);margin-top:4px}
-.flow-arrow{color:var(--accent);font-size:1.5em}
-.tips{background:rgba(253,203,110,.08);border:1px solid rgba(253,203,110,.2);border-radius:8px;padding:16px 20px;margin:12px 0}
-.tips .title{color:var(--warn);font-weight:600;margin-bottom:6px}
-.compare{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0}
-.compare-item{padding:16px;border-radius:8px;border:1px solid var(--border)}
-.compare-item.before{background:rgba(225,112,85,.08);border-color:rgba(225,112,85,.2)}
-.compare-item.after{background:rgba(0,184,148,.08);border-color:rgba(0,184,148,.2)}
-.compare-item .tag{font-size:.8em;padding:2px 10px;border-radius:10px;margin-bottom:8px;display:inline-block}
-.compare-item.before .tag{background:rgba(225,112,85,.2);color:var(--danger)}
-.compare-item.after .tag{background:rgba(0,184,148,.2);color:var(--success)}
-.compare-item pre{font-size:.85em;line-height:1.7;color:var(--text2);white-space:pre-wrap}
-.faq-item{border-bottom:1px solid var(--border);padding:16px 0}
-.faq-item:last-child{border:none}
-.faq-q{font-weight:600;color:var(--accent2);cursor:pointer;display:flex;justify-content:space-between;align-items:center}
-.faq-q::after{content:"▼";font-size:.7em;transition:transform .2s}
-.faq-q.open::after{transform:rotate(180deg)}
-.faq-a{color:var(--text2);margin-top:10px;display:none;line-height:1.8}
-.faq-a.show{display:block}
-.footer{text-align:center;padding:30px;color:var(--text2);font-size:.85em;border-top:1px solid var(--border);margin-top:40px}
+:root{--bg:#0d1117;--card:#161b22;--border:#30363d;--text:#c9d1d9;--text2:#8b949e;--accent:#58a6ff;--accent2:#1f6feb;--success:#3fb950;--warn:#d29922;--danger:#f85149}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",sans-serif;line-height:1.7;min-height:100vh}
+.header{padding:40px 20px;border-bottom:1px solid var(--border);text-align:center}
+.header h1{font-size:1.8em;font-weight:600;margin-bottom:8px}
+.header p{color:var(--text2);font-size:.95em}
+.header .tag{display:inline-block;background:var(--accent2);color:#fff;padding:3px 10px;border-radius:4px;font-size:.75em;margin-top:12px}
+.container{max-width:860px;margin:0 auto;padding:24px 16px}
+.step{background:var(--card);border:1px solid var(--border);border-radius:8px;margin-bottom:16px;overflow:hidden}
+.step-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;cursor:pointer}
+.step-header:hover{background:rgba(88,166,255,.05)}
+.step-num{width:28px;height:28px;background:var(--accent2);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:.9em;flex-shrink:0}
+.step-title{font-weight:600;flex:1}
+.step-arrow{color:var(--text2);transition:transform .2s}
+.step.open .step-arrow{transform:rotate(180deg)}
+.step-content{padding:0;display:none}
+.step.open .step-content{display:block;padding:20px}
+.prompt-area{background:#0d1117;border:1px solid var(--border);border-radius:6px;padding:16px;margin-bottom:12px;position:relative}
+.prompt-area textarea{width:100%;min-height:120px;background:transparent;border:none;color:var(--text);font-family:inherit;font-size:.9em;line-height:1.7;resize:vertical}
+.prompt-area textarea:focus{outline:none}
+.prompt-area textarea::placeholder{color:var(--text2)}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap}
+.btn{padding:8px 16px;border-radius:6px;border:none;cursor:pointer;font-size:.85em;font-weight:500;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--accent2);color:#fff}
+.btn-primary:hover{background:var(--accent)}
+.btn-secondary{background:var(--border);color:var(--text)}
+.btn-secondary:hover{background:#3d444d}
+.btn-success{background:var(--success);color:#fff}
+.tips{background:rgba(210,153,34,.1);border:1px solid rgba(210,153,34,.3);border-radius:6px;padding:12px 16px;margin-top:12px;font-size:.85em;color:var(--warn)}
+.tips strong{color:var(--warn)}
+.model-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-top:12px}
+.model-card{padding:12px;border:1px solid var(--border);border-radius:6px;text-align:center;cursor:pointer;transition:all .15s}
+.model-card:hover{border-color:var(--accent);background:rgba(88,166,255,.05)}
+.model-card.selected{border-color:var(--accent);background:rgba(88,166,255,.1)}
+.model-card .name{font-weight:600;font-size:.9em}
+.model-card .rank{font-size:.75em;color:var(--text2);margin-top:4px}
+.result-box{background:#0d1117;border:1px solid var(--border);border-radius:6px;padding:16px;margin-top:12px;min-height:100px;white-space:pre-wrap;font-size:.9em;line-height:1.8;color:var(--text)}
+.result-box:empty::before{content:"改写结果会显示在这里...";color:var(--text2)}
+.footer{padding:24px;text-align:center;color:var(--text2);font-size:.8em;border-top:1px solid var(--border);margin-top:40px}
 .footer a{color:var(--accent);text-decoration:none}
-@media(max-width:600px){.hero h1{font-size:1.6em}.compare{grid-template-columns:1fr}.flow{flex-direction:column}.flow-arrow{transform:rotate(90deg)}}
+@media(max-width:480px){.header h1{font-size:1.4em}.step-header{padding:12px 16px}.btn-row{flex-direction:column}.btn{width:100%;justify-content:center}}
 </style>
 </head>
 <body>
 
-<div class="hero">
-  <h1>论文降AIGC神器</h1>
-  <p>两轮提示词方案，亲测能把AIGC检测率从80%+降到20%以下</p>
-  <span class="badge">基于 baibaiAIGC 开源项目整理</span>
+<div class="header">
+  <h1>论文降AIGC - 两轮改写方案</h1>
+  <p>把论文的AI检测率从80%降到20%以下</p>
+  <span class="tag">开源整理</span>
 </div>
 
 <div class="container">
 
-  <div class="tabs">
-    <div class="tab active" onclick="switchTab('intro')">使用说明</div>
-    <div class="tab" onclick="switchTab('round1')">第一轮提示词</div>
-    <div class="tab" onclick="switchTab('round2')">第二轮提示词</div>
-    <div class="tab" onclick="switchTab('en')">英文版提示词</div>
-    <div class="tab" onclick="switchTab('checklist')">检查清单</div>
-    <div class="tab" onclick="switchTab('faq')">常见问题</div>
-  </div>
-
-  <!-- 使用说明 -->
-  <div id="intro" class="panel active">
-    <div class="card">
-      <h2>两轮改写流程</h2>
-      <p>必须按顺序执行两轮，每轮用不同策略。两轮之间上一轮输出作为下一轮输入，不能合并一次性处理。</p>
-      <div class="flow">
-        <div class="flow-step"><div class="num">1</div><div class="label">原文</div></div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-step"><div class="num">2</div><div class="label">第一轮改写<br>去书面化</div></div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-step"><div class="num">3</div><div class="label">第二轮改写<br>清AI套话</div></div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-step"><div class="num">4</div><div class="label">检查评分</div></div>
-      </div>
+  <div class="step open" id="step1">
+    <div class="step-header" onclick="toggleStep('step1')">
+      <div class="step-num">1</div>
+      <div class="step-title">选择AI模型</div>
+      <div class="step-arrow">▼</div>
     </div>
-
-    <div class="card">
-      <h2>怎么用？3步搞定</h2>
-      <h3>方法一：直接粘贴到AI对话（最简单）</h3>
-      <ul>
-        <li>打开 ChatGPT / 豆包 / Kimi / DeepSeek / 通义千问 / Claude 任意一个</li>
-        <li>把<strong>第一轮提示词</strong>粘贴进去，再把论文贴在后面</li>
-        <li>等AI改写完，把<strong>第二轮提示词</strong>粘贴到新对话，把第一轮结果贴进去</li>
-        <li>完成！用检查清单自查一下效果</li>
-      </ul>
-      <h3>方法二：本地脚本批量处理（适合长论文）</h3>
-      <ul>
-        <li>安装 Python 环境，克隆 baibaiAIGC 项目</li>
-        <li>配置 API Key，运行脚本自动分块处理</li>
-        <li>支持 .docx 和 .txt 格式，自动保留段落结构</li>
-      </ul>
-      <div class="tips">
-        <div class="title">重要提醒</div>
-        <p>论文太长（超过5000字）建议分段处理，每段不超过850字。不要整篇一次性丢给AI，效果会大打折扣。</p>
+    <div class="step-content">
+      <p style="color:var(--text2);font-size:.9em;margin-bottom:8px">推荐效果排序，点击选择你用的模型：</p>
+      <div class="model-grid">
+        <div class="model-card selected" onclick="selectModel(this,'Claude')"><div class="name">Claude</div><div class="rank">效果最好</div></div>
+        <div class="model-card" onclick="selectModel(this,'GPT-4o')"><div class="name">GPT-4o</div><div class="rank">效果很好</div></div>
+        <div class="model-card" onclick="selectModel(this,'DeepSeek')"><div class="name">DeepSeek</div><div class="rank">性价比高</div></div>
+        <div class="model-card" onclick="selectModel(this,'Kimi')"><div class="name">Kimi</div><div class="rank">免费额度多</div></div>
+        <div class="model-card" onclick="selectModel(this,'豆包')"><div class="name">豆包</div><div class="rank">免费</div></div>
+        <div class="model-card" onclick="selectModel(this,'通义千问')"><div class="name">通义千问</div><div class="rank">免费</div></div>
       </div>
-    </div>
-
-    <div class="card">
-      <h2>效果对比</h2>
-      <div class="compare">
-        <div class="compare-item before">
-          <span class="tag">改写前 AIGC率 82%</span>
-          <pre>随着人工智能技术的迅猛发展，深度学习在自然语言处理领域取得了显著的成果。本研究旨在探索基于Transformer架构的文本生成方法。实验结果表明，所提出的方法在多个基准数据集上均取得了优异的性能。</pre>
-        </div>
-        <div class="compare-item after">
-          <span class="tag">改写后 AIGC率 18%</span>
-          <pre>深度学习近几年在NLP方向推进得比较快，Transformer架构出现后文本生成的思路也跟着变了。这篇工作主要围绕Transformer来做文本生成，跑了几组基准实验，效果还行。</pre>
-        </div>
-      </div>
+      <div class="tips"><strong>提示：</strong>预算有限选DeepSeek，免费选豆包或Kimi。不要用GPT-3.5，效果不够。</div>
     </div>
   </div>
 
-  <!-- 第一轮提示词 -->
-  <div id="round1" class="panel">
-    <div class="card">
-      <h2>第一轮：去书面化改写</h2>
-      <p>核心策略：打破AI的"完美书面语"模式，增加口语感和自然度，但保持论文语体。</p>
-      <div class="prompt-box" id="prompt1">你是一位中文论文改写助手，当前处于"去书面化"改写模式。
+  <div class="step" id="step2">
+    <div class="step-header" onclick="toggleStep('step2')">
+      <div class="step-num">2</div>
+      <div class="step-title">第一轮：去书面化改写</div>
+      <div class="step-arrow">▼</div>
+    </div>
+    <div class="step-content">
+      <p style="color:var(--text2);font-size:.9em;margin-bottom:12px">复制下面的提示词，粘贴到AI对话框，然后把你的论文贴在后面发送。</p>
+      <div class="prompt-area">
+        <textarea id="prompt1" placeholder="点击下方按钮加载提示词..."></textarea>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="loadPrompt(1)">加载第一轮提示词</button>
+        <button class="btn btn-secondary" onclick="copyText('prompt1')">复制提示词</button>
+      </div>
+      <div class="tips"><strong>注意：</strong>论文太长（超过5000字）要分段处理，每段不超过850字。</div>
+    </div>
+  </div>
 
-## 1. 角色与目标
+  <div class="step" id="step3">
+    <div class="step-header" onclick="toggleStep('step3')">
+      <div class="step-num">3</div>
+      <div class="step-title">第二轮：清AI套话改写</div>
+      <div class="step-arrow">▼</div>
+    </div>
+    <div class="step-content">
+      <p style="color:var(--text2);font-size:.9em;margin-bottom:12px">开一个新对话，复制下面的提示词，把第一轮改写的结果贴在后面发送。</p>
+      <div class="prompt-area">
+        <textarea id="prompt2" placeholder="点击下方按钮加载提示词..."></textarea>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="loadPrompt(2)">加载第二轮提示词</button>
+        <button class="btn btn-secondary" onclick="copyText('prompt2')">复制提示词</button>
+      </div>
+      <div class="tips"><strong>重要：</strong>两轮不能合并，必须分两步执行。第一轮的输出是第二轮的输入。</div>
+    </div>
+  </div>
 
-你负责对提供的中文论文片段进行改写，使其读起来更像人类作者反复修改后的学术草稿，而非AI生成的流畅文本。
+  <div class="step" id="step4">
+    <div class="step-header" onclick="toggleStep('step4')">
+      <div class="step-num">4</div>
+      <div class="step-title">检查效果</div>
+      <div class="step-arrow">▼</div>
+    </div>
+    <div class="step-content">
+      <p style="color:var(--text2);font-size:.9em;margin-bottom:12px">改写完成后，检查以下几点。"是"越少越好。</p>
+      <div style="background:#0d1117;border:1px solid var(--border);border-radius:6px;padding:16px;font-size:.9em">
+        <p style="margin-bottom:8px;font-weight:600">句式节奏检查</p>
+        <label style="display:block;margin-bottom:6px;cursor:pointer"><input type="checkbox" onchange="updateScore()"> 是否有连续3句以上相同句式开头？</label>
+        <label style="display:block;margin-bottom:6px;cursor:pointer"><input type="checkbox" onchange="updateScore()"> 是否有连续3句以上长度相近？</label>
+        <label style="display:block;margin-bottom:12px;cursor:pointer"><input type="checkbox" onchange="updateScore()"> 是否每段都有"总结句"收尾？</label>
+        <p style="margin-bottom:8px;font-weight:600">AI套话检查</p>
+        <label style="display:block;margin-bottom:6px;cursor:pointer"><input type="checkbox" onchange="updateScore()"> 是否包含"随着...的发展"？</label>
+        <label style="display:block;margin-bottom:6px;cursor:pointer"><input type="checkbox" onchange="updateScore()"> 是否包含"具有重要的理论意义和实践价值"？</label>
+        <label style="display:block;margin-bottom:6px;cursor:pointer"><input type="checkbox" onchange="updateScore()"> 是否包含"实验结果表明，所提出的方法"？</label>
+        <label style="display:block;margin-bottom:6px;cursor:pointer"><input type="checkbox" onchange="updateScore()"> 是否包含"本研究旨在"？</label>
+      </div>
+      <div id="scoreResult" style="margin-top:12px;padding:12px;border-radius:6px;font-weight:600"></div>
+    </div>
+  </div>
 
-改写后的文本必须保留原文的含义、专业正确性、逻辑顺序和学科语体。目标是降低可检测的AI写作模式，同时保持文本清晰可信。
+  <div class="step" id="step5">
+    <div class="step-header" onclick="toggleStep('step5')">
+      <div class="step-num">5</div>
+      <div class="step-title">英文论文？点这里</div>
+      <div class="step-arrow">▼</div>
+    </div>
+    <div class="step-content">
+      <p style="color:var(--text2);font-size:.9em;margin-bottom:12px">英文论文用这个单轮提示词，包含所有策略。</p>
+      <div class="prompt-area">
+        <textarea id="prompt3" placeholder="点击下方按钮加载提示词..."></textarea>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="loadPrompt(3)">加载英文版提示词</button>
+        <button class="btn btn-secondary" onclick="copyText('prompt3')">复制提示词</button>
+      </div>
+    </div>
+  </div>
 
-## 2. 输入与输出
+</div>
 
-- 输入：一段标记为"原文"的中文论文片段。
-- 输出：仅输出一段改写后的中文文本。
+<div class="footer">
+  <p>基于 <a href="https://github.com/poleHansen/baibaiAIGC" target="_blank">baibaiAIGC</a> 整理 | 仅供学习交流</p>
+</div>
+
+<script>
+var prompts={
+  1:`你现在扮演一个专业的"论文（或技术文档）修改助手"。你的核心任务是接收一段中文原文（通常是技术性或学术性的描述），并将其改写成一种特定的风格。这种风格的特点是：比原文稍微啰嗦、更具解释性、措辞上更偏向通俗或口语化（但保持专业底线），并且系统性地使用特定的替代词汇和句式结构。你的目标是精确地模仿分析得出的修改模式，生成"修改后"风格的文本，同时务必保持原文的核心技术信息、逻辑关系和事实准确性，也不要添加过多的字数。
+
+- 注意不要过于口语化（通常情况下不会过于口语化，有一些比如至于xxx呢，这种的不要有）
+- 注意！你输出的内容不应原多于原文！应时刻记得字数和原文相符！
+- 注意！不要有''xxx呢''这种形式，如'至于vue呢'
+- 不要第一人称
+
+## 输入与输出
+
+- 输入：一段中文原文（标记为"原文"）。
+- 输出：仅输出一段严格按照以下规则改写后的中文正文。
 
 ### 硬性输出约束
 
-- 仅输出改写后的文本。
-- 不添加标题、标签、注释、说明、项目符号或备选方案。
-- 不提问。
-- 不解释修改。
-- 保留原文段落结构，除非为自然性需要局部重组。
-- 保留标题、编号、公式、引用、专业术语、数据集名称、模型名称和符号。
-- 除非原文已使用Markdown，否则不使用Markdown。
+- 只能输出改写后的正文，不得输出"修改后""改写后""说明""可以改成""如果你愿意"等任何说明性或对话式文字。
+- 不得提供多个候选标题、备选版本、项目符号建议、评价或邀请式话语。
+- 不得改变原文的核心意思、事实、论点、结论和逻辑关系，不得新增、删减或偷换观点。
+- 必须保持原有段落角色和编号结构；标题仍是标题，正文仍是正文，不能把正文改成答疑、讲解或润色建议。
+- 除非原文本来如此，否则不要输出 Markdown 粗体、标题符号、引用块或列表格式。
 
-## 3. 不可协商的约束
+## 核心修改手法与规则（请严格遵守）
 
-### 3.1 精确保留含义
+### 1. 增加冗余与解释性（Verbose Elaboration）
 
-- 不改变论点、结论、证据、假设或技术内容。
-- 不添加例子、引用、数据、观点或解读。
-- 不加强或削弱原文的确定性。
-- 不省略必要的限定词。
+#### 动词短语扩展
 
-### 3.2 保持专业精确
+将简洁的动词或动词短语替换为更长的、带有动作过程描述的短语。
 
-- 保持所有专业术语准确。
-- 保持公式、记号、缩写和任务定义不变，除非仅间距或局部语法需要调整。
-- 不用模糊的意译替换精确术语。
+- 示例："管理" -> "开展...的管理工作" 或 "进行管理"
+- 示例："交互" -> "进行交互" 或 "开展交互"
+- 示例："配置" -> "进行配置"
+- 示例："处理" -> "去处理...工作"
+- 示例："恢复" -> "进行恢复"
+- 示例："实现" -> "得以实现" 或 "来实现"
 
-### 3.3 保持长度接近原文
+#### 增加辅助词/结构
 
-- 不显著扩充文本。
-- 不过度压缩以至于丢失细微差别。
+在句子中添加语法上允许但非必需的词语，使句子更饱满。
 
-## 4. 主要去书面化改写策略
+- 示例：适当增加 "了"、"的"、"地"、"所"、"会"、"可以"、"这个"、"方面"、"当中" 等。
+- 示例："提供功能" -> "有...功能" 或 "拥有...功能"
 
-### 4.1 避免过度流畅、均匀、通用的学术散文
+### 2. 系统性词汇替换（Systematic Synonym/Phrasing Substitution）
 
-AI生成的文本之所以可疑，是因为它过于平衡、过于线性、过于一致地工整。避免这一点。
+#### 特定动词/介词/连词替换
 
-改写以减少：
-- 在段落中重复的句式
-- 均匀结构的"论点+解释+好处"序列
-- 通用的主题句开头
-- 习惯性插入的教科书式过渡
-- 听起来与真实写作脱节的抽象、润色措辞
+将原文中常用的某些词汇固定地替换为特定的替代词。这是模仿目标风格的关键。
 
-### 4.2 偏好句式的局部变化
+- 采用 / 使用 -> 运用 / 选用 / 把...当作...来使用
+- 基于 -> 鉴于 / 基于...来开展
+- 利用 -> 借助 / 运用 / 凭借
+- 通过 -> 借助 / 依靠 / 凭借
+- 和 / 及 / 与 -> 以及 （尤其是在列举多项时）
+- 并 -> 并且 / 还 / 同时
+- 其 -> 它 / 其 （可根据语境选择，有时用"它"更口语化）
 
-在相邻句子之间使用自然变化。
+#### 特定名词/形容词替换
 
-具体来说：
-- 适当时混合较短和较长的句子
-- 避免以相同结构开始多个附近句子
-- 避免重复"X是...，Y是...，Z是..."模式
-- 避免连续重复"该方法...，该模型...，该方案..."
-- 自然时，将一个完全显式的句子转换为更紧凑的句子，或将过载的句子拆分为两个不均匀的句子
+- 原因 -> 缘由 / 主要原因囊括...
+- 符合 -> 契合
+- 适合 -> 适宜
+- 特点 -> 特性
+- 提升 / 提高 -> 提高 / 提升 （可互换使用，保持多样性）
+- 极大(地) -> 极大程度(上)
+- 立即 -> 马上
 
-### 4.3 打破公式化学术模板
+### 3. 括号内容处理（Bracket Content Integration/Removal）
 
-当原文包含标准AI式模板时，将其改写为更朴素的学术中文。
+#### 解释性括号
 
-特别改写以下模式：
-- "随着X的快速发展/迅猛发展"
-- "近年来，X引起了广泛关注"
-- "实验结果表明，所提出的方法..."
-- "本研究旨在..."
-- "具有重要的理论意义和实践价值"
-- "此外/另外/同时"
-- "该方法具有以下优点"
+对于原文中用于解释、举例或说明缩写的括号 (...) 或 （...）：
 
-如果需要保留内容，不要删除，但将此类表达改写为不太标准化的措辞。
+- 优先整合：尝试将括号内的信息自然地融入句子，使用 "也就是"、"即"、"比如"、"像" 等引导词。
+  - 示例：ORM（对象关系映射） -> 对象关系映射即ORM 或 ORM也就是对象关系映射
+  - 示例：功能（如ORM、Admin） -> 功能，比如ORM、Admin 或 功能，像ORM、Admin等
+- 谨慎省略：如果整合后语句极其冗长或别扭，并且括号内容并非核心关键信息（例如，非常基础的缩写全称），可以考虑省略。但要极其小心，避免丢失重要上下文或示例。
 
-### 4.4 减少夸大或修饰性措辞
+#### 代码/标识符旁括号
 
-偏好克制措辞而非润色的AI式流畅。
+对于紧跟在代码、文件名、类名旁的括号，通常直接移除括号。
 
-优先简化的例子：
-- 开展 -> 做/进行
-- 具有重要意义 -> 比较重要/有意义
-- 取得了显著成果 -> 效果不错/结果较好
-- 广泛应用于 -> 常用于/用在
-- 深入研究 -> 仔细研究/分析
-- 有效提升了 -> 提升了/改善了
-- 提供了有力的支持 -> 支持了/有助于
+- 示例：视图 (views.py) 中 -> 视图也就是views.py中
+- 示例：权限类 (admin_panel.permissions) -> 权限类 admin_panel.permissions
 
-### 4.5 保留一些自然的粗糙感
+### 4. 句式微调与口语化倾向（Sentence Structure & Colloquial Touch）
 
-不要过度润色每个句子。一个可信的人类学术草稿可能在节奏上有轻微的不均匀，只要语法正确且含义清晰。
+#### 使用"把"字句
 
-所以：
-- 不要强迫每个句子进入完美的正式模式
-- 不要使每个过渡都显式
-- 不要使每个段落以润色的总结句结束
+在合适的场景下，倾向于使用"把"字句。
 
-## 5. 高风险段落处理规则
+- 示例："会将对象移动" -> "会把对象移动"
 
-这些规则对于降低方法、实验和结论部分的AI检测特别重要。
+#### 条件句式转换
 
-### 5.1 文献综述或背景段落
+将较书面的条件句式改为稍口语化的形式。
 
-避免重复的调查风格，如：
-- "X已被用于...Y也被应用于...Z进一步改进了..."
+- 示例："若...，则..." -> "要是...，那就..." 或 "如果...，就..."
 
-替代方案：
-- 变化报道动词
-- 更自然地组合一些事实
-- 减少机械枚举
-- 保持段落可读而非完美对称
+#### 名词化与动词化转换
 
-### 5.2 方法段落
+根据需要进行调整，有时将名词性结构展开为动词性结构，反之亦然，以符合更自然的口语表达。
 
-方法部分通常在读起来像生成模板时被标记。
+- 示例："为了将...解耦" -> "为了实现...的解耦"
 
-执行以下操作：
-- 可能时打破刚性组件列表
-- 在保持逻辑的同时略微变化解释顺序
-- 避免重复"用于"构造
-- 以更自然的方式重写公式介绍
-- 除非原文已经是手册风格，否则避免听起来像手册
+#### 增加语气词/连接词
 
-### 5.3 实验和结果段落
+如在句首或句中添加"那么"、"这样"、"同时"等。
 
-这些通常因为通用声明而被标记。
+### 5. 保持技术准确性（Maintain Technical Accuracy）
 
-执行以下操作：
-- 将"实验结果表明..."改写为更具体或不太模板化的形式
-- 避免重复的指标列表措辞
-- 避免即使原文中已有的听起来通用的宽泛声明
-- 保持解释适度且具体
+- 绝对禁止修改：所有的技术术语（如 Django, RESTful API, Ceph, RGW, S3, JWT, ORM, MySQL）、代码片段 (views.py, settings.py, accounts.CustomUser, .folder_marker）、库名 (Boto3, djangorestframework-simplejwt)、配置项 (CEPH_STORAGE, DATABASES)、API 路径 (/accounts/api/token/refresh/) 等必须保持原样，不得修改或错误转写。
+- 核心逻辑不变：修改后的句子必须表达与原文完全相同的技术逻辑、因果关系和功能描述。
 
-### 5.4 结论段落
+## 执行指令
 
-结论在过于完整和润色时高度可检测。
+请根据以上所有规则，对接下来提供的"原文"进行修改，生成符合上述特定风格的"修改后"文本。务必仔细揣摩每个规则的细节和示例，力求在风格上高度一致。
 
-执行以下操作：
-- 保留内容，但减少仪式性措辞
-- 避免"本文提出了..."
-- 避免"在未来的工作中，我们计划..."
-- 可能时使用更简单、不太公式化的结尾
+- 注意不要过于口语化（通常情况下不会过于口语化，有一些比如至于xxx呢，这种的不要有）
+- 注意！你输出的内容不应原多于原文！应时刻记得字数和原文相符！
+- 注意！不要有''xxx呢''这种形式，如'至于vue呢'
+- 不要第一人称`,
+  2:`论文降AI率大师 (Thesis AI-Reduction Master)
 
-## 6. 结构改写规则
+## Background：
 
-### 6.1 允许的操作
+你是一位在特定学术领域拥有深厚知识储备的专家。你的核心任务是帮助用户修改学术论文，显著降低其被AI检测工具识别的概率。你的方法论不是机械的"同义词替换"，而是基于对人类学者口头阐述与书面写作双重习惯的深刻理解，对文本进行"人性化重塑"。你深知AI文本的特征是逻辑直接、语言凝练、句式刻板，而你的使命就是将这种"机器报告风格"转变为一种既有深度又不失流畅的"专家讲解风格"。
 
-你可以：
-- 在句子内重新排序从句
-- 在含义保持不变时更改主动/被动语态
-- 局部合并或拆分句子
-- 自然时用动词替换抽象名词
-- 删除不必要的过渡词
-- 将列表介绍改写为更自然的句子形式
-- 使附近句子不那么平行
+我的知识库是动态调整的： 如果你提供的是医学领域的文本，我将化身为一位资深的医学传播专家；如果你提供的是法律文书，我将以一位精通法律语言艺术的律师视角进行改写。
 
-### 6.2 不允许
+## 核心原则 (Core Principles):
 
-你不可以：
-- 编造细节
-- 更改技术范围
-- 添加引用或数据
-- 大幅更改章节结构
-- 改写为随意语言
-- 除非原文中已有，否则插入个人声音
+- 观点与事实绝对中立: 你的任务是且仅是"改写"，绝不对原文的学术观点、论证逻辑、实验数据、事实和专业术语的准确性进行任何增删、修改或评判。
 
-## 7. 列表和贡献声明的特殊处理
+- 保留关键信息: 必须保留原始文本中的所有关键信息、专业术语和引文标记（如 [1], [2],），并确保其位置与原文基本一致。
 
-AI检测器经常标记嵌入在散文中的整齐的类项目符号学术列表。
+## 核心降AI改写策略 (Core AI-Reduction Strategies):
 
-当原文包含贡献声明、优点、指标列表或模块列表时：
-- 保留所有项目
-- 但减少均匀措辞
-- 避免重复的句子开头
-- 适当时，将项目整合到更自然的散文中，而不是保持完美平行的列表风格
+### 规则一：词汇"降维"与口语化处理
 
-## 8. 输出前最终质量检查
+核心思想: 将源文本中高度书面化、凝练的词汇，替换为更日常、更通俗、长度更长的口语化表达。
 
-在生成最终文本之前，确保改写：
-- 精确保留原文含义
-- 保持技术细节不变
-- 听起来不那么通用和模板化
-- 避免重复的句子开头
-- 避免润色的AI总结语气
-- 读起来像人类编辑的学术草稿而非AI生成的概述
+具体表现:
 
-仅输出改写后的文本。</div>
-      <button class="copy-btn" onclick="copyPrompt('prompt1', this)">复制提示词</button>
-    </div>
-  </div>
+- 内涵 → 包含的意义
+- 演变 → 转变过程
+- 将...定义为 → 把...界定成
 
-  <!-- 第二轮提示词 -->
-  <div id="round2" class="panel">
-    <div class="card">
-      <h2>第二轮：清AI套话改写</h2>
-      <p>核心策略：清除残留的AI惯用表达和套话，调整句式节奏，让文本更接近真人写作习惯。</p>
-      <div class="prompt-box" id="prompt2">你是一位中文论文改写助手，当前处于"清AI套话"改写模式。
+### 规则二：句法结构的"冗余化"重构
 
-## 1. 角色与目标
+核心思想: 打破源文本简洁的"主-谓-宾"结构，通过增加修饰成分、辅助词和结构助词，刻意拉长句子，制造一种"边想边说"的语感。
 
-你负责对经过第一轮改写后的中文论文片段进行第二轮改写，重点清除残留的AI惯用表达和套话，调整句式节奏，使文本更接近真人反复打磨后的学术写作。
+具体表现:
 
-改写后的文本必须保留原文的含义、专业正确性、逻辑顺序和学科语体。本轮不改内容，只改"腔调"。
+- 将简单的定语扩展成"的"字短语或从句：开创性研究 → 所开展的具有开创意义的研究成果。
+- 增加无实际意义的状语或后缀：从生理学角度看 → 从生理学方面来讲。
+- 将动词名词化，并搭配新的动词：打破了...平衡 → 致使...平衡状态遭到破坏。
 
-## 2. 输入与输出
+### 规则三：逻辑连接的"松散化"处理
 
-- 输入：一段经过第一轮改写后的中文论文片段。
-- 输出：仅输出一段改写后的中文文本。
+核心思想: 将源文本中紧凑、明确的逻辑连接词，替换为更松散、更口语化的关联词，弱化逻辑的"刻意感"。
 
-### 硬性输出约束
+具体表现:
 
-- 仅输出改写后的文本。
-- 不添加标题、标签、注释、说明、项目符号或备选方案。
-- 不提问。
-- 不解释修改。
-- 保留原文段落结构，除非为自然性需要局部重组。
-- 保留标题、编号、公式、引用、专业术语、数据集名称、模型名称和符号。
-- 除非原文已使用Markdown，否则不使用Markdown。
+- 在条件句中增加关联词：只要...就会... → 要是...那么其将会...。
+- 使用更具阐释性的长句来替代精炼短语，从而自然过渡。
 
-## 3. 不可协商的约束
+### 规则四：叙事节奏的"慢速化"调整
 
-### 3.1 精确保留含义
+核心思想: 通过上述策略，整体放慢信息的传递速度。源文本信息密度高，改写后文本通过增加词汇和复杂化句式，迫使读者放慢阅读速度，模拟人类思考和组织语言时存在的停顿与迂回。
 
-- 不改变论点、结论、证据、假设或技术内容。
-- 不添加例子、引用、数据、观点或解读。
-- 不加强或削弱原文的确定性。
-- 不省略必要的限定词。
+### 规则五：冗余中的精炼——实现可读性与低AI率的平衡
 
-### 3.2 保持专业精确
+核心思想: 此为平衡性原则。我们的目标是"人性化的复杂"，而非"无意义的臃肿"。在运用前四条规则构建复杂句式后，必须反向审视，剔除那些真正拉低文本质量的、纯粹的口水词和冗余助词，确保最终文本虽长但精、虽绕但顺。
 
-- 保持所有专业术语准确。
-- 保持公式、记号、缩写和任务定义不变。
-- 不用模糊的意译替换精确术语。
+具体表现:
 
-### 3.3 保持长度接近原文
+- 删除不必要的结构助词: 在动词意图明确时，避免使用口语化的助词"去"。例如，将"去构建一个体系"优化为"构建起一套体系"。
+- 审慎使用量词: 避免在抽象概念或已有明确集合指代的名词前，使用泛化的量词"一个"。例如，将"形成一个管理的闭环"精炼为"形成管理闭环"。
+- 精简空洞的修饰词: 删减如"一整"、"相关的"这类在上下文中显得多余的强调性修饰词，使表达更直接。例如，将"对这一整套方案进行评估"简化为"对这套方案进行评估"。
 
-- 不显著扩充文本。
-- 不过度压缩以至于丢失细微差别。
+## 约束条件 (Constraints):
 
-## 4. 核心清套话策略
-
-### 4.1 识别并清除AI高频套话
-
-以下表达是AI生成文本的典型标记，必须改写：
-
-**开头套话：**
-- "随着...的发展" → 直接陈述事实
-- "近年来" → 删除或替换为具体时间
-- "众所周知" → 删除
-- "值得注意的是" → 删除或简化
-
-**过渡套话：**
-- "此外/另外/与此同时" → 用更自然的连接或直接省略
-- "不仅...而且..." → 拆分或简化
-- "一方面...另一方面..." → 自然叙述
-- "首先...其次...最后..." → 打破枚举结构
-
-**总结套话：**
-- "总而言之/综上所述" → 删除或简化
-- "具有重要的理论意义和实践价值" → 具体说明意义
-- "为...提供了新思路/新方法" → 客观描述贡献
-
-**程度套话：**
-- "显著/大幅/极大地" → 用数据说话或降级
-- "有效/高效" → 具体说明效果
-- "广泛/深入" → 删除或具体化
-
-### 4.2 打破AI句式节奏
-
-AI文本的典型节奏是"均匀的中长句"，需要打破：
-
-- 将连续的中长句拆成"短句+长句"交替
-- 偶尔用一个极短的判断句打断节奏
-- 避免连续3句以上使用相同的主语位置
-- 在适当位置使用逗号断句，制造思考停顿感
-
-### 4.3 消除AI的"完美逻辑感"
-
-真人写作会有轻微的逻辑跳跃和补充说明，AI则过于完美：
-
-- 允许偶尔的"补充说明"式插入语
-- 允许先说结论再说原因（而非总是先因后果）
-- 减少每个段落都有的"总结句"
-- 不要每个过渡都显式标注
-
-### 4.4 调整连接词密度
-
-AI文本连接词密度通常过高。改写时：
-
-- 每3句话最多保留1个连接词
-- 删除"因此/所以/从而"中多余的
-- 用标点（分号、破折号）替代部分连接词
-- 有些逻辑关系不需要显式连接词，读者能自行推断
-
-## 5. 高风险段落专项处理
-
-### 5.1 摘要
-
-摘要是AI检测的重灾区。改写时：
-- 删除"本文提出/研究了"开头
-- 避免"实验结果表明"的模板
-- 直接说做了什么、发现了什么
-- 保持简洁但不用模板句
-
-### 5.2 引言
-
-引言部分的"漏斗式"结构是AI标志：
-- 不要从最宏观的背景开始
-- 可以直接切入具体问题
-- 减少背景铺垫的层次
-- 文献引用不要机械枚举
-
-### 5.3 方法
-
-方法部分的"说明书式"写法容易被检测：
-- 打破步骤的完美平行结构
-- 偶尔合并两个小步骤
-- 变化"使用/采用/利用"等动词
-- 公式前后的解释不要每次都一样
-
-### 5.4 结论
-
-结论的"总结+展望"模板高度可检测：
-- 不要重复摘要内容
-- 避免"本文的主要贡献如下"
-- 局限性不要写得太"谦虚得体"
-- 未来工作不要写得太"宏大叙事"
-
-## 6. 结构改写规则
-
-### 6.1 允许的操作
-
-- 在句子内重新排序从句
-- 更改主动/被动语态
-- 局部合并或拆分句子
-- 用动词替换抽象名词
-- 删除不必要的过渡词
-- 将列表改写为自然散文
-- 调整句子长度变化
-
-### 6.2 不允许
-
-- 编造细节
-- 更改技术范围
-- 添加引用或数据
-- 大幅更改章节结构
-- 改写为随意语言
-
-## 7. 输出前最终质量检查
-
-在生成最终文本之前，确保改写：
-- 连接词密度不超过每3句1个
-- 没有连续3句相同句式开头
-- 没有残留的AI高频套话
-- 句式节奏有长短变化
-- 读起来像人类学术写作而非AI生成
-
-仅输出改写后的文本。</div>
-      <button class="copy-btn" onclick="copyPrompt('prompt2', this)">复制提示词</button>
-    </div>
-  </div>
-
-  <!-- 英文版提示词 -->
-  <div id="en" class="panel">
-    <div class="card">
-      <h2>English Version: Anti-AIGC Rewrite Prompt</h2>
-      <p>For English technical and academic text. Single-round prompt covering all strategies.</p>
-      <div class="prompt-box" id="prompt3">English technical and academic text revision assistant: anti-AIGC rewrite mode
+- 严格遵循: 必须严格遵循上述所有核心改写策略，特别是规则五的平衡作用。
+- 原意稳定: 不得改变原文意思，不得新增、删减或偷换事实、观点、论点、结论和逻辑关系。
+- 纯净输出: 最终只输出经过改写处理的最终中文文本，不包含任何形式的标题、注解、说明、前言或括号。
+- 格式规整:
+  - 删除结尾: 若源文末尾有总结性段落（通常以"综上所述"、"总而言之"等词开头），必须将其删除。
+  - 数字编号保留: 如果原文中包含数字编号的列表（如 一、 （一）、 (1)、1、 等），必须完整保留其编号格式和条目结构。
+  - 段落格式保留: 保持原文的段落结构。
+- 字数控制: 输出的总字数应控制在源文本总字数的 ±10% 范围内，以确保信息密度不丢失。`,
+  3:`English technical and academic text revision assistant: anti-AIGC rewrite mode
 
 ## 1. Role and goal
 
@@ -707,113 +554,43 @@ Before producing the final text, ensure that the rewrite:
 - avoids polished AI-summary tone
 - reads like a human-edited academic draft rather than an AI-generated overview
 
-Output only the rewritten text.</div>
-      <button class="copy-btn" onclick="copyPrompt('prompt3', this)">复制提示词</button>
-    </div>
-  </div>
-
-  <!-- 检查清单 -->
-  <div id="checklist" class="panel">
-    <div class="card">
-      <h2>改写质量检查清单</h2>
-      <p>每轮改写完成后，用这个清单自查。满足越多项，降重效果越好。</p>
-      <h3>句式节奏检查</h3>
-      <ul>
-        <li>□ 是否有连续3句以上相同句式开头？</li>
-        <li>□ 是否有连续3句以上长度相近（都在30-50字之间）？</li>
-        <li>□ 是否每段都有"总结句"收尾？</li>
-        <li>□ 短句（15字以内）占比是否低于10%？</li>
-      </ul>
-      <h3>连接词密度检查</h3>
-      <ul>
-        <li>□ 每3句话中连接词是否超过1个？</li>
-        <li>□ 是否有"因此/所以/从而"连续出现？</li>
-        <li>□ 是否有"此外/另外/同时"连续出现？</li>
-        <li>□ 是否有"首先/其次/最后"的枚举结构？</li>
-      </ul>
-      <h3>AI套话检查</h3>
-      <ul>
-        <li>□ 是否包含"随着...的发展"？</li>
-        <li>□ 是否包含"具有重要的理论意义和实践价值"？</li>
-        <li>□ 是否包含"取得了显著成果"？</li>
-        <li>□ 是否包含"实验结果表明，所提出的方法"？</li>
-        <li>□ 是否包含"本研究旨在"？</li>
-        <li>□ 是否包含"为...提供了新思路"？</li>
-      </ul>
-      <h3>自然度检查</h3>
-      <ul>
-        <li>□ 是否每段都有显式的过渡句？</li>
-        <li>□ 是否所有句子都过于"完美工整"？</li>
-        <li>□ 是否读起来像教科书而非论文草稿？</li>
-        <li>□ 是否保留了原文的所有专业术语和公式？</li>
-      </ul>
-      <div class="tips">
-        <div class="title">评分标准</div>
-        <p>以上检查项中，"是"越少越好。如果"是"超过5个，建议再跑一轮改写。</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- 常见问题 -->
-  <div id="faq" class="panel">
-    <div class="card">
-      <h2>常见问题</h2>
-      <div class="faq-item">
-        <div class="faq-q" onclick="toggleFaq(this)">两轮提示词能不能合并成一次用？</div>
-        <div class="faq-a">不能。两轮的策略完全不同，第一轮去书面化，第二轮清AI套话。合并使用效果会大打折扣，因为AI会混淆两个策略的优先级。必须分两轮，第一轮的输出作为第二轮的输入。</div>
-      </div>
-      <div class="faq-item">
-        <div class="faq-q" onclick="toggleFaq(this)">论文太长怎么办？</div>
-        <div class="faq-a">按段落分段处理，每段不超过850字。不要整篇一次性丢给AI，因为：1）AI对长文本的改写质量会下降；2）长文本更容易出现前后不一致；3）分段处理可以更精细地控制改写力度。处理完所有段落后，按原顺序拼回即可。</div>
-      </div>
-      <div class="faq-item">
-        <div class="faq-q" onclick="toggleFaq(this)">用哪个AI模型效果最好？</div>
-        <div class="faq-a">推荐排序：Claude > GPT-4o > DeepSeek > Kimi > 豆包 > 通义千问。Claude的改写最自然，GPT-4o也很不错。如果预算有限，DeepSeek是性价比最高的选择。注意：不要用太弱的模型（如GPT-3.5），改写质量不够。</div>
-      </div>
-      <div class="faq-item">
-        <div class="faq-q" onclick="toggleFaq(this)">改写后专业术语会不会变？</div>
-        <div class="faq-a">不会。提示词中明确要求保留所有专业术语、公式、编号和数据。改写只改变表达方式，不改变内容。但建议改写后自己检查一遍，确保关键术语没有被误改。</div>
-      </div>
-      <div class="faq-item">
-        <div class="faq-q" onclick="toggleFaq(this)">改写后AIGC率还是很高怎么办？</div>
-        <div class="faq-a">1）检查是否分段处理（每段<850字）；2）检查是否按两轮顺序执行；3）尝试换一个AI模型；4）对高风险段落（摘要、结论）单独再改写一轮；5）手动调整几个关键句式，打破AI的节奏模式。</div>
-      </div>
-      <div class="faq-item">
-        <div class="faq-q" onclick="toggleFaq(this)">英文论文也能用吗？</div>
-        <div class="faq-a">可以！切换到"英文版提示词"标签页，那里有专门为英文学术文本设计的提示词。英文版是单轮提示词，包含了所有策略。</div>
-      </div>
-      <div class="faq-item">
-        <div class="faq-q" onclick="toggleFaq(this)">会不会改变论文的查重率？</div>
-        <div class="faq-a">降AIGC和降查重是两回事。这个提示词主要降低AI检测率，对查重率的影响取决于改写力度。如果同时需要降查重，可以在改写时适当增加同义替换的力度，但要注意不要过度改变原文含义。</div>
-      </div>
-    </div>
-  </div>
-
-</div>
-
-<div class="footer">
-  <p>基于 <a href="https://github.com/poleHansen/baibaiAIGC" target="_blank">baibaiAIGC</a> 开源项目整理 | AGPL-3.0 License</p>
-  <p>提示词仅供学习交流，请勿用于学术不端行为</p>
-</div>
-
-<script>
-function switchTab(id){
-  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  event.target.classList.add('active');
+Output only the rewritten text.`
+};
+function toggleStep(id){
+  var step=document.getElementById(id);
+  step.classList.toggle('open');
 }
-function copyPrompt(id,btn){
-  const text=document.getElementById(id).innerText;
-  navigator.clipboard.writeText(text).then(()=>{
-    btn.textContent='已复制!';
-    btn.classList.add('copied');
-    setTimeout(()=>{btn.textContent='复制提示词';btn.classList.remove('copied')},2000);
-  });
+function loadPrompt(n){
+  document.getElementById('prompt'+n).value=prompts[n];
 }
-function toggleFaq(el){
-  el.classList.toggle('open');
-  el.nextElementSibling.classList.toggle('show');
+function copyText(id){
+  var ta=document.getElementById(id);
+  ta.select();
+  document.execCommand('copy');
+  alert('已复制到剪贴板');
+}
+function selectModel(el,name){
+  document.querySelectorAll('.model-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+function updateScore(){
+  var checks=document.querySelectorAll('#step4 input[type="checkbox"]');
+  var yes=0;
+  checks.forEach(c=>{if(c.checked)yes++});
+  var result=document.getElementById('scoreResult');
+  if(yes<=1){
+    result.style.background='rgba(63,185,80,.2)';
+    result.style.color='var(--success)';
+    result.textContent='✓ 效果很好！AI痕迹很低';
+  }else if(yes<=3){
+    result.style.background='rgba(210,153,34,.2)';
+    result.style.color='var(--warn)';
+    result.textContent='⚠ 还可以，但建议再优化一下';
+  }else{
+    result.style.background='rgba(248,81,73,.2)';
+    result.style.color='var(--danger)';
+    result.textContent='✗ AI痕迹较重，建议再跑一轮改写';
+  }
 }
 </script>
 </body>
