@@ -82,6 +82,13 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 
 .guarantee{text-align:center;padding:12px;font-size:.78em;color:var(--success);margin-top:10px}
 
+.tools{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:16px}
+.tools h4{font-size:.85em;margin-bottom:10px;color:var(--text2)}
+.tools .links{display:flex;flex-wrap:wrap;gap:8px}
+.tools a{background:var(--bg);border:1px solid var(--border);border-radius:5px;padding:6px 12px;color:var(--text);text-decoration:none;font-size:.8em;transition:all .15s}
+.tools a:hover{border-color:var(--accent);color:var(--accent)}
+.tools .cat{font-size:.75em;color:var(--text2);margin-top:10px;margin-bottom:6px}
+
 .foot{padding:24px;text-align:center;color:var(--text2);font-size:.72em;border-top:1px solid var(--border);margin-top:20px}
 .foot a{color:var(--accent);text-decoration:none}
 
@@ -116,6 +123,26 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
       <div class="txt">现实场景里，目标检测算法碰到遮挡情况的时候，检测精度往往不太理想。针对这个问题，我们设计了一套改进方案——在YOLOv8的基础上，加入多尺度特征融合的思路。具体来说，把CBAM注意力机制和自适应特征金字塔网络用到了模型里，这样模型就能更好地"看到"那些被遮挡住的目标。拿到COCO数据集上跑了一下，结果显示mAP比原来的模型高了3.2个百分点。</div>
       <div class="score s2">18%</div><div class="slbl">句式多变 · 口语化 · 自然</div>
     </div>
+  </div>
+</div>
+
+<div class="tools">
+  <h4>🔧 常用工具直达</h4>
+  <div class="cat">AI 模型（改写用）</div>
+  <div class="links">
+    <a href="https://chat.deepseek.com/" target="_blank">DeepSeek</a>
+    <a href="https://www.doubao.com/" target="_blank">豆包</a>
+    <a href="https://claude.ai/" target="_blank">Claude</a>
+    <a href="https://chat.openai.com/" target="_blank">ChatGPT</a>
+    <a href="https://kimi.moonshot.cn/" target="_blank">Kimi</a>
+    <a href="https://tongyi.aliyun.com/" target="_blank">通义千问</a>
+  </div>
+  <div class="cat">AIGC 检测（查AI率）</div>
+  <div class="links">
+    <a href="https://matrix.tencent.com/ai-detect/" target="_blank">朱雀检测</a>
+    <a href="http://wfai.qkcnki.com/" target="_blank">万方AIGC</a>
+    <a href="https://aicheck.oversea.cnki.net/" target="_blank">知网AIGC</a>
+    <a href="https://www.aigcleaner.com/" target="_blank">AIGCleaner</a>
   </div>
 </div>
 
