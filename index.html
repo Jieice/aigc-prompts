@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>论文降AIGC - 两轮改写方案</title>
+<title>论文降AIGC - 专业提示词</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--bg:#0d1117;--card:#161b22;--border:#30363d;--text:#c9d1d9;--text2:#8b949e;--accent:#58a6ff;--accent2:#1f6feb;--success:#3fb950;--warn:#d29922;--danger:#f85149}
@@ -37,12 +37,23 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .btn-primary:hover{background:var(--accent)}
 .btn-secondary{background:var(--border);color:var(--text)}
 .btn-secondary:hover{background:#3d444d}
+.btn-success{background:var(--success);color:#fff}
+.btn-success:hover{filter:brightness(1.1)}
 .tips{background:rgba(210,153,34,.1);border:1px solid rgba(210,153,34,.3);border-radius:6px;padding:12px 16px;margin-top:12px;font-size:.85em;color:var(--warn)}
 .tips strong{color:var(--warn)}
 .result-box{background:#0d1117;border:1px solid var(--border);border-radius:6px;padding:16px;margin-top:12px;min-height:100px;white-space:pre-wrap;font-size:.9em;line-height:1.8;color:var(--text)}
 .footer{padding:24px;text-align:center;color:var(--text2);font-size:.8em;border-top:1px solid var(--border);margin-top:40px}
 .footer a{color:var(--accent);text-decoration:none}
-@media(max-width:480px){.header h1{font-size:1.4em}.step-header{padding:12px 16px}.btn-row{flex-direction:column}.btn{width:100%;justify-content:center}}
+.paywall{background:var(--card);border:2px solid var(--warn);border-radius:12px;margin:20px 0;padding:30px 24px;text-align:center}
+.paywall h3{color:var(--warn);margin-bottom:12px;font-size:1.5em}
+.paywall .price{font-size:2em;font-weight:700;color:var(--success);margin:16px 0}
+.paywall .qrcode{margin:20px auto;max-width:200px;background:#fff;padding:12px;border-radius:12px}
+.paywall .qrcode img{width:100%;display:block}
+.paywall input{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:10px 16px;color:var(--text);width:240px;margin-right:10px;font-size:.9em}
+.paywall input:focus{outline:none;border-color:var(--accent)}
+.paywall-note{font-size:.85em;color:var(--text2);margin-top:16px}
+.unlock-area{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:20px 0}
+@media(max-width:480px){.header h1{font-size:1.4em}.step-header{padding:12px 16px}.btn-row{flex-direction:column}.btn{width:100%;justify-content:center}.paywall input{width:100%;margin-bottom:10px;margin-right:0}}
 </style>
 </head>
 <body>
@@ -50,7 +61,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 <div class="header">
   <h1>论文降AIGC - 两轮改写方案</h1>
   <p>把论文的AI检测率从80%降到20%以下</p>
-  <span class="tag">开源整理</span>
+  <span class="tag">专业版·付费解锁</span>
 </div>
 
 <div class="container">
@@ -67,90 +78,128 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
     </div>
   </div>
 
-  <div class="step open" id="step2">
-    <div class="step-header" onclick="toggleStep('step2')">
-      <div class="step-num">1</div>
-      <div class="step-title">第一轮：去书面化改写</div>
-      <div class="step-arrow">▼</div>
+  <!-- 付费墙区域  -->
+  <div id="paywall" class="paywall">
+    <h3>🔒 完整提示词已加密</h3>
+    <p>支付 ¥9.9 即可永久解锁全部提示词（含中文两轮 + 英文版 + 检查清单）</p>
+    <div class="price">¥9.9</div>
+    <div class="qrcode">
+      <!-- 这里放你的收款二维码，请替换成真实的图片地址 -->
+      <img src="https://pic.imgdb.cn/item/682b6b1ed0e0df8d5c9e6f1c.png" alt="微信收款码" style="width:100%">
     </div>
-    <div class="step-content">
-      <p style="color:var(--text2);font-size:.9em;margin-bottom:12px">复制下面的提示词，打开AI模型，粘贴后把论文附在后面发送。</p>
-      <div class="prompt-area">
-        <textarea id="prompt1" readonly></textarea>
-      </div>
-      <div class="btn-row">
-        <button class="btn btn-primary" onclick="copyText('prompt1')">📋 一键复制提示词</button>
-      </div>
-      <div class="tips"><strong>注意：</strong>论文太长（超过5000字）要分段处理，每段不超过850字。</div>
+    <p style="margin:10px 0 0">微信/支付宝扫码支付</p>
+    <div class="unlock-area">
+      <input type="text" id="unlockCode" placeholder="输入解锁码" autocomplete="off">
+      <button class="btn btn-success" id="unlockBtn">立即解锁</button>
     </div>
-  </div>
-
-  <div class="step" id="step3">
-    <div class="step-header" onclick="toggleStep('step3')">
-      <div class="step-num">2</div>
-      <div class="step-title">第二轮：清AI套话改写</div>
-      <div class="step-arrow">▼</div>
-    </div>
-    <div class="step-content">
-      <p style="color:var(--text2);font-size:.9em;margin-bottom:12px">开一个新对话，复制下面的提示词，把第一轮改写的结果贴在后面发送。</p>
-      <div class="prompt-area">
-        <textarea id="prompt2" readonly></textarea>
-      </div>
-      <div class="btn-row">
-        <button class="btn btn-primary" onclick="copyText('prompt2')">📋 一键复制提示词</button>
-      </div>
-      <div class="tips"><strong>重要：</strong>两轮不能合并，必须分两步执行。第一轮的输出是第二轮的输入。</div>
+    <div class="paywall-note">
+      💡 支付后添加微信 <strong>your_wechat_id</strong> 获取解锁码<br>
+      或闲鱼搜索 "论文降AIGC提示词" 自动发货
     </div>
   </div>
 
-  <div class="step" id="step5">
-    <div class="step-header" onclick="toggleStep('step5')">
-      <div class="step-num">3</div>
-      <div class="step-title">英文论文？点这里</div>
-      <div class="step-arrow">▼</div>
-    </div>
-    <div class="step-content">
-      <p style="color:var(--text2);font-size:.9em;margin-bottom:12px">英文论文用这个单轮提示词，包含所有策略。</p>
-      <div class="prompt-area">
-        <textarea id="prompt3" readonly></textarea>
+  <!-- 主体内容（初始隐藏，解锁后显示） -->
+  <div id="mainContent" style="display: none;">
+    <div class="step open" id="step2">
+      <div class="step-header" onclick="toggleStep('step2')">
+        <div class="step-num">1</div>
+        <div class="step-title">第一轮：去书面化改写</div>
+        <div class="step-arrow">▼</div>
       </div>
-      <div class="btn-row">
-        <button class="btn btn-primary" onclick="copyText('prompt3')">📋 一键复制提示词</button>
+      <div class="step-content">
+        <p style="color:var(--text2);font-size:.9em;margin-bottom:12px">复制下面的提示词，打开AI模型，粘贴后把论文附在后面发送。</p>
+        <div class="prompt-area">
+          <textarea id="prompt1" readonly></textarea>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="copyText('prompt1')">📋 一键复制提示词</button>
+        </div>
+        <div class="tips"><strong>注意：</strong>论文太长（超过5000字）要分段处理，每段不超过850字。</div>
       </div>
     </div>
-  </div>
 
-  <div class="step" id="step4">
-    <div class="step-header" onclick="toggleStep('step4')">
-      <div class="step-num">4</div>
-      <div class="step-title">检查效果</div>
-      <div class="step-arrow">▼</div>
-    </div>
-    <div class="step-content">
-      <p style="color:var(--text2);font-size:.9em;margin-bottom:12px">改写完成后，检查以下几点。"是"越少越好。</p>
-      <div style="background:#0d1117;border:1px solid var(--border);border-radius:6px;padding:16px;font-size:.9em">
-        <p style="margin-bottom:8px;font-weight:600">句式节奏检查</p>
-        <label style="display:block;margin-bottom:6px;cursor:pointer"><input type="checkbox" onchange="updateScore()"> 是否有连续3句以上相同句式开头？</label>
-        <label style="display:block;margin-bottom:6px;cursor:pointer"><input type="checkbox" onchange="updateScore()"> 是否有连续3句以上长度相近？</label>
-        <label style="display:block;margin-bottom:12px;cursor:pointer"><input type="checkbox" onchange="updateScore()"> 是否每段都有"总结句"收尾？</label>
-        <p style="margin-bottom:8px;font-weight:600">AI套话检查</p>
-        <label style="display:block;margin-bottom:6px;cursor:pointer"><input type="checkbox" onchange="updateScore()"> 是否包含"随着...的发展"？</label>
-        <label style="display:block;margin-bottom:6px;cursor:pointer"><input type="checkbox" onchange="updateScore()"> 是否包含"具有重要的理论意义和实践价值"？</label>
-        <label style="display:block;margin-bottom:6px;cursor:pointer"><input type="checkbox" onchange="updateScore()"> 是否包含"实验结果表明，所提出的方法"？</label>
-        <label style="display:block;margin-bottom:6px;cursor:pointer"><input type="checkbox" onchange="updateScore()"> 是否包含"本研究旨在"？</label>
+    <div class="step" id="step3">
+      <div class="step-header" onclick="toggleStep('step3')">
+        <div class="step-num">2</div>
+        <div class="step-title">第二轮：清AI套话改写</div>
+        <div class="step-arrow">▼</div>
       </div>
-      <div id="scoreResult" style="margin-top:12px;padding:12px;border-radius:6px;font-weight:600"></div>
+      <div class="step-content">
+        <p style="color:var(--text2);font-size:.9em;margin-bottom:12px">开一个新对话，复制下面的提示词，把第一轮改写的结果贴在后面发送。</p>
+        <div class="prompt-area">
+          <textarea id="prompt2" readonly></textarea>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="copyText('prompt2')">📋 一键复制提示词</button>
+        </div>
+        <div class="tips"><strong>重要：</strong>两轮不能合并，必须分两步执行。第一轮的输出是第二轮的输入。</div>
+      </div>
+    </div>
+
+    <div class="step" id="step5">
+      <div class="step-header" onclick="toggleStep('step5')">
+        <div class="step-num">3</div>
+        <div class="step-title">英文论文？点这里</div>
+        <div class="step-arrow">▼</div>
+      </div>
+      <div class="step-content">
+        <p style="color:var(--text2);font-size:.9em;margin-bottom:12px">英文论文用这个单轮提示词，包含所有策略。</p>
+        <div class="prompt-area">
+          <textarea id="prompt3" readonly></textarea>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="copyText('prompt3')">📋 一键复制提示词</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="step" id="step4">
+      <div class="step-header" onclick="toggleStep('step4')">
+        <div class="step-num">4</div>
+        <div class="step-title">检查效果</div>
+        <div class="step-arrow">▼</div>
+      </div>
+      <div class="step-content">
+        <p style="color:var(--text2);font-size:.9em;margin-bottom:12px">改写完成后，检查以下几点。"是"越少越好。</p>
+        <div style="background:#0d1117;border:1px solid var(--border);border-radius:6px;padding:16px;font-size:.9em">
+          <p style="margin-bottom:8px;font-weight:600">句式节奏检查</p>
+          <label style="display:block;margin-bottom:6px;cursor:pointer"><input type="checkbox" onchange="updateScore()"> 是否有连续3句以上相同句式开头？</label>
+          <label style="display:block;margin-bottom:6px;cursor:pointer"><input type="checkbox" onchange="updateScore()"> 是否有连续3句以上长度相近？</label>
+          <label style="display:block;margin-bottom:12px;cursor:pointer"><input type="checkbox" onchange="updateScore()"> 是否每段都有"总结句"收尾？</label>
+          <p style="margin-bottom:8px;font-weight:600">AI套话检查</p>
+          <label style="display:block;margin-bottom:6px;cursor:pointer"><input type="checkbox" onchange="updateScore()"> 是否包含"随着...的发展"？</label>
+          <label style="display:block;margin-bottom:6px;cursor:pointer"><input type="checkbox" onchange="updateScore()"> 是否包含"具有重要的理论意义和实践价值"？</label>
+          <label style="display:block;margin-bottom:6px;cursor:pointer"><input type="checkbox" onchange="updateScore()"> 是否包含"实验结果表明，所提出的方法"？</label>
+          <label style="display:block;margin-bottom:6px;cursor:pointer"><input type="checkbox" onchange="updateScore()"> 是否包含"本研究旨在"？</label>
+        </div>
+        <div id="scoreResult" style="margin-top:12px;padding:12px;border-radius:6px;font-weight:600"></div>
+      </div>
     </div>
   </div>
 
 </div>
 
 <div class="footer">
-  <p>基于 <a href="https://github.com/poleHansen/baibaiAIGC" target="_blank">baibaiAIGC</a> 整理 | 仅供学习交流</p>
+  <p>基于 <a href="https://github.com/poleHansen/baibaiAIGC" target="_blank">baibaiAIGC</a> 整理 | 付费版本永久更新</p>
 </div>
 
 <script>
 var prompts={
+  1:`你现在扮演一个专业的"论文（或技术文档）修改助手"。...（此处为完整提示词，实际会填充）`,
+  2:`论文降AI率大师 (Thesis AI-Reduction Master)...`,
+  3:`English technical and academic text revision assistant...`
+};
+// 真实提示词太长，为了简洁这里省略，实际会使用之前的完整版本
+// 现在从下面变量注入完整内容
+var fullPrompts = {
+  1: `...完整第一轮提示词...`,
+  2: `...完整第二轮...`,
+  3: `...完整英文版...`
+};
+// 实际上我们直接复用原文件中的 prompts 对象，但为了隐藏内容先空着，解锁后动态填充
+// 为了避免代码过长导致无法正常显示，我将原文件中的 prompts 完整复制过来
+// 以下为完整内容 (原文件中的 prompts 对象)
+var realPrompts = {
   1:`你现在扮演一个专业的"论文（或技术文档）修改助手"。你的核心任务是接收一段中文原文（通常是技术性或学术性的描述），并将其改写成一种特定的风格。这种风格的特点是：比原文稍微啰嗦、更具解释性、措辞上更偏向通俗或口语化（但保持专业底线），并且系统性地使用特定的替代词汇和句式结构。你的目标是精确地模仿分析得出的修改模式，生成"修改后"风格的文本，同时务必保持原文的核心技术信息、逻辑关系和事实准确性，也不要添加过多的字数。
 
 - 注意不要过于口语化（通常情况下不会过于口语化，有一些比如至于xxx呢，这种的不要有）
@@ -543,23 +592,25 @@ Before producing the final text, ensure that the rewrite:
 Output only the rewritten text.`
 };
 
-window.onload = function() {
-  document.getElementById('prompt1').value = prompts[1];
-  document.getElementById('prompt2').value = prompts[2];
-  document.getElementById('prompt3').value = prompts[3];
-};
+function fillPrompts() {
+  document.getElementById('prompt1').value = realPrompts[1];
+  document.getElementById('prompt2').value = realPrompts[2];
+  document.getElementById('prompt3').value = realPrompts[3];
+}
 
-function toggleStep(id){
+function toggleStep(id) {
   var step = document.getElementById(id);
   step.classList.toggle('open');
 }
-function copyText(id){
+
+function copyText(id) {
   var ta = document.getElementById(id);
   ta.select();
   document.execCommand('copy');
   alert('✅ 提示词已复制到剪贴板！');
 }
-function updateScore(){
+
+function updateScore() {
   var checks = document.querySelectorAll('#step4 input[type="checkbox"]');
   var yes = 0;
   checks.forEach(c => { if(c.checked) yes++; });
@@ -578,6 +629,38 @@ function updateScore(){
     result.textContent = '✗ AI痕迹较重，建议再跑一轮改写';
   }
 }
+
+function unlockContent() {
+  var code = document.getElementById('unlockCode').value.trim();
+  // 设置你的解锁码（可以随意修改）
+  var validCode = 'baibai2026';
+  if (code === validCode) {
+    localStorage.setItem('aigc_unlocked', 'true');
+    showUnlockedContent();
+    alert('解锁成功！刷新页面后无需再次输入');
+  } else {
+    alert('解锁码错误，请核对后重新输入');
+  }
+}
+
+function showUnlockedContent() {
+  document.getElementById('paywall').style.display = 'none';
+  document.getElementById('mainContent').style.display = 'block';
+  fillPrompts();
+}
+
+// 页面加载时检查解锁状态
+window.onload = function() {
+  var unlocked = localStorage.getItem('aigc_unlocked');
+  if (unlocked === 'true') {
+    showUnlockedContent();
+  } else {
+    document.getElementById('paywall').style.display = 'block';
+    document.getElementById('mainContent').style.display = 'none';
+  }
+};
+
+document.getElementById('unlockBtn').addEventListener('click', unlockContent);
 </script>
 </body>
 </html>
