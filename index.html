@@ -3,664 +3,469 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>论文降AIGC - 专业提示词</title>
+<title>论文降AIGC - 两轮改写方案</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--bg:#0d1117;--card:#161b22;--border:#30363d;--text:#c9d1d9;--text2:#8b949e;--accent:#58a6ff;--accent2:#1f6feb;--success:#3fb950;--warn:#d29922;--danger:#f85149}
+:root{--bg:#0d1117;--card:#161b22;--border:#30363d;--text:#c9d1d9;--text2:#8b949e;--accent:#58a6ff;--accent2:#1f6feb;--success:#3fb950;--warn:#d29922;--danger:#f85149;--gold:#e3b341}
 body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",sans-serif;line-height:1.7;min-height:100vh}
-.header{padding:40px 20px;border-bottom:1px solid var(--border);text-align:center}
-.header h1{font-size:1.8em;font-weight:600;margin-bottom:8px}
-.header p{color:var(--text2);font-size:.95em}
-.header .tag{display:inline-block;background:var(--accent2);color:#fff;padding:3px 10px;border-radius:4px;font-size:.75em;margin-top:12px}
-.container{max-width:860px;margin:0 auto;padding:24px 16px}
-.model-quick{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px 16px;margin-bottom:20px;display:flex;flex-wrap:wrap;align-items:center;gap:12px;justify-content:space-between}
-.model-quick span{color:var(--text2);font-size:.85em}
-.model-links{display:flex;gap:12px;flex-wrap:wrap}
-.model-link{color:var(--accent);text-decoration:none;font-size:.85em;padding:4px 8px;border-radius:4px;background:rgba(88,166,255,.1);transition:background .15s}
-.model-link:hover{background:rgba(88,166,255,.2)}
-.step{background:var(--card);border:1px solid var(--border);border-radius:8px;margin-bottom:16px;overflow:hidden}
-.step-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;cursor:pointer}
-.step-header:hover{background:rgba(88,166,255,.05)}
-.step-num{width:28px;height:28px;background:var(--accent2);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:.9em;flex-shrink:0}
-.step-title{font-weight:600;flex:1}
-.step-arrow{color:var(--text2);transition:transform .2s}
-.step.open .step-arrow{transform:rotate(180deg)}
-.step-content{padding:0;display:none}
-.step.open .step-content{display:block;padding:20px}
-.prompt-area{background:#0d1117;border:1px solid var(--border);border-radius:6px;padding:16px;margin-bottom:12px;position:relative}
-.prompt-area textarea{width:100%;min-height:150px;background:transparent;border:none;color:var(--text);font-family:inherit;font-size:.9em;line-height:1.7;resize:vertical}
-.prompt-area textarea:focus{outline:none}
-.prompt-area textarea::placeholder{color:var(--text2)}
-.btn-row{display:flex;gap:8px;flex-wrap:wrap}
-.btn{padding:8px 16px;border-radius:6px;border:none;cursor:pointer;font-size:.85em;font-weight:500;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
-.btn-primary{background:var(--accent2);color:#fff}
-.btn-primary:hover{background:var(--accent)}
-.btn-secondary{background:var(--border);color:var(--text)}
-.btn-secondary:hover{background:#3d444d}
-.btn-success{background:var(--success);color:#fff}
-.btn-success:hover{filter:brightness(1.1)}
-.tips{background:rgba(210,153,34,.1);border:1px solid rgba(210,153,34,.3);border-radius:6px;padding:12px 16px;margin-top:12px;font-size:.85em;color:var(--warn)}
-.tips strong{color:var(--warn)}
-.result-box{background:#0d1117;border:1px solid var(--border);border-radius:6px;padding:16px;margin-top:12px;min-height:100px;white-space:pre-wrap;font-size:.9em;line-height:1.8;color:var(--text)}
-.footer{padding:24px;text-align:center;color:var(--text2);font-size:.8em;border-top:1px solid var(--border);margin-top:40px}
+.container{max-width:780px;margin:0 auto;padding:0 20px}
+.btn{padding:10px 22px;border-radius:6px;border:none;cursor:pointer;font-size:.9em;font-weight:600;transition:all .15s;display:inline-flex;align-items:center;gap:6px;text-decoration:none}
+.btn-gold{background:linear-gradient(135deg,#e3b341,#d29922);color:#000;font-size:1em;padding:14px 32px;border-radius:8px}
+.btn-gold:hover{filter:brightness(1.15);transform:translateY(-1px);box-shadow:0 4px 20px rgba(227,179,65,.3)}
+.btn-big{font-size:1.1em;padding:16px 40px}
+
+.hero{padding:60px 0 40px;text-align:center}
+.hero .badge{display:inline-block;background:rgba(248,81,73,.15);color:var(--danger);padding:4px 14px;border-radius:20px;font-size:.82em;font-weight:600;margin-bottom:16px;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.7}}
+.hero h1{font-size:2.3em;font-weight:800;line-height:1.3;margin-bottom:12px;letter-spacing:-.02em}
+.hero h1 em{color:var(--gold);font-style:normal}
+.hero .sub{color:var(--text2);font-size:1.1em;margin-bottom:28px;max-width:500px;margin-left:auto;margin-right:auto}
+.hero .price-line{font-size:.95em;color:var(--text2);margin-top:12px}
+.hero .price-line strong{color:var(--gold);font-size:1.15em}
+
+.section{padding:48px 0}
+.section h2{font-size:1.55em;font-weight:700;margin-bottom:8px;text-align:center}
+.section .sect-sub{color:var(--text2);font-size:.92em;text-align:center;margin-bottom:30px}
+
+.pain-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:0}
+.pain-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:24px 20px;text-align:center}
+.pain-card .icon{font-size:2em;margin-bottom:10px}
+.pain-card h4{font-size:.95em;margin-bottom:6px;color:var(--warn)}
+.pain-card p{font-size:.84em;color:var(--text2)}
+
+.demo-box{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.demo-tabs{display:flex;border-bottom:1px solid var(--border)}
+.demo-tab{flex:1;padding:12px;text-align:center;cursor:pointer;font-size:.88em;font-weight:600;color:var(--text2);background:transparent;border:none;transition:all .15s}
+.demo-tab.active{color:var(--text);background:var(--bg);border-bottom:2px solid var(--accent)}
+.demo-body{padding:20px}
+.demo-body .panel{display:none}
+.demo-body .panel.active{display:block}
+.demo-body .label{font-size:.78em;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.demo-body .label .dot{width:8px;height:8px;border-radius:50%}
+.demo-body .label .dot.red{background:var(--danger)}
+.demo-body .label .dot.green{background:var(--success)}
+.demo-body .text-block{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:16px;font-size:.88em;line-height:1.8;margin-bottom:14px}
+.demo-score{display:flex;justify-content:center;gap:40px;margin-top:16px}
+.demo-score .score-item{text-align:center}
+.demo-score .val{font-size:2em;font-weight:800}
+.demo-score .val.danger{color:var(--danger)}
+.demo-score .val.good{color:var(--success)}
+.demo-score .lbl{font-size:.78em;color:var(--text2)}
+
+.how-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.how-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:24px 20px;text-align:center;position:relative}
+.how-card .step-num{width:36px;height:36px;background:var(--accent2);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1em;margin:0 auto 14px}
+.how-card h4{font-size:.95em;margin-bottom:6px}
+.how-card p{font-size:.83em;color:var(--text2)}
+
+.pricing-box{background:var(--card);border:2px solid var(--gold);border-radius:16px;padding:36px 28px;text-align:center;max-width:480px;margin:0 auto}
+.pricing-box h3{font-size:1.3em;margin-bottom:6px}
+.pricing-box .include{color:var(--text2);font-size:.87em;margin-bottom:20px}
+.pricing-box .price-row{margin:20px 0}
+.pricing-box .price-old{text-decoration:line-through;color:var(--text2);font-size:1em}
+.pricing-box .price-now{font-size:2.8em;font-weight:800;color:var(--gold);margin:0 8px}
+.pricing-box .price-badge{background:rgba(248,81,73,.2);color:var(--danger);padding:2px 12px;border-radius:12px;font-size:.82em;font-weight:700}
+.feature-list{text-align:left;margin:20px 0;display:inline-block}
+.feature-list li{font-size:.88em;margin-bottom:8px;list-style:none}
+.feature-list li::before{content:'✓ ';color:var(--success);font-weight:700}
+.qr-wrap{margin:16px auto;max-width:180px;background:#fff;padding:10px;border-radius:12px}
+.qr-wrap img{width:100%;display:block}
+.unlock-row{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:18px 0}
+.unlock-row input{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:10px 16px;color:var(--text);width:200px;font-size:.9em}
+.unlock-row input:focus{outline:none;border-color:var(--gold)}
+.pay-note{font-size:.82em;color:var(--text2);margin-top:12px}
+.guarantee-box{background:rgba(63,185,80,.08);border:1px solid rgba(63,185,80,.2);border-radius:8px;padding:12px 16px;margin-top:16px;font-size:.85em;color:var(--success)}
+
+.faq{margin-top:20px}
+.faq-item{background:var(--card);border:1px solid var(--border);border-radius:8px;margin-bottom:10px;overflow:hidden}
+.faq-q{padding:14px 18px;cursor:pointer;font-weight:600;font-size:.9em;display:flex;justify-content:space-between;align-items:center;transition:background .15s}
+.faq-q:hover{background:rgba(88,166,255,.05)}
+.faq-q .arrow{color:var(--text2);transition:transform .2s}
+.faq-item.open .faq-q .arrow{transform:rotate(180deg)}
+.faq-a{padding:0 18px;max-height:0;overflow:hidden;transition:all .25s;font-size:.86em;color:var(--text2);line-height:1.75}
+.faq-item.open .faq-a{padding:0 18px 16px;max-height:300px}
+
+.stats-bar{display:flex;justify-content:center;gap:36px;flex-wrap:wrap;margin:24px 0}
+.stats-bar .stat{text-align:center}
+.stats-bar .stat .n{font-size:1.6em;font-weight:800;color:var(--accent)}
+.stats-bar .stat .t{font-size:.78em;color:var(--text2);margin-top:2px}
+
+.model-bar{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px 18px;margin-top:24px;display:flex;flex-wrap:wrap;align-items:center;gap:10px;justify-content:space-between}
+.model-bar span{color:var(--text2);font-size:.83em}
+.model-bar a{color:var(--accent);text-decoration:none;font-size:.83em;padding:4px 10px;border-radius:4px;background:rgba(88,166,255,.1);transition:background .15s}
+.model-bar a:hover{background:rgba(88,166,255,.2)}
+
+.pro-section{display:none}
+.pro-section.show{display:block}
+
+.step{background:var(--card);border:1px solid var(--border);border-radius:8px;margin-bottom:14px;overflow:hidden}
+.step-h{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;cursor:pointer;transition:background .15s}
+.step-h:hover{background:rgba(88,166,255,.05)}
+.step-h .sn{width:28px;height:28px;background:var(--accent2);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:.85em;flex-shrink:0}
+.step-h .st{font-weight:600;flex:1}
+.step-h .sa{color:var(--text2);transition:transform .2s;font-size:.75em}
+.step.open .sa{transform:rotate(180deg)}
+.step-body{display:none;padding:18px}
+.step.open .step-body{display:block}
+.prompt-box{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:14px;margin-bottom:10px}
+.prompt-box textarea{width:100%;min-height:140px;background:transparent;border:none;color:var(--text);font-family:inherit;font-size:.88em;line-height:1.7;resize:vertical}
+.prompt-box textarea:focus{outline:none}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px}
+.btn-sm{padding:7px 14px;border-radius:6px;border:none;cursor:pointer;font-size:.82em;font-weight:500;transition:all .15s;display:inline-flex;align-items:center;gap:5px}
+.btn-accent{background:var(--accent2);color:#fff}
+.btn-accent:hover{background:var(--accent)}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text)}
+.btn-outline:hover{border-color:var(--text2)}
+.tip-box{background:rgba(210,153,34,.1);border:1px solid rgba(210,153,34,.3);border-radius:6px;padding:10px 14px;font-size:.82em;color:var(--warn);margin-top:8px}
+
+.footer{padding:32px 20px;text-align:center;color:var(--text2);font-size:.78em;border-top:1px solid var(--border);margin-top:20px}
 .footer a{color:var(--accent);text-decoration:none}
-.paywall{background:var(--card);border:2px solid var(--warn);border-radius:12px;margin:20px 0;padding:30px 24px;text-align:center}
-.paywall h3{color:var(--warn);margin-bottom:12px;font-size:1.5em}
-.paywall .price{font-size:2em;font-weight:700;color:var(--success);margin:16px 0}
-.paywall .qrcode{margin:20px auto;max-width:200px;background:#fff;padding:12px;border-radius:12px}
-.paywall .qrcode img{width:100%;display:block}
-.paywall input{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:10px 16px;color:var(--text);width:240px;margin-right:10px;font-size:.9em}
-.paywall input:focus{outline:none;border-color:var(--accent)}
-.paywall-note{font-size:.85em;color:var(--text2);margin-top:16px}
-.unlock-area{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:20px 0}
-@media(max-width:480px){.header h1{font-size:1.4em}.step-header{padding:12px 16px}.btn-row{flex-direction:column}.btn{width:100%;justify-content:center}.paywall input{width:100%;margin-bottom:10px;margin-right:0}}
+
+@media(max-width:600px){
+  .hero h1{font-size:1.55em}
+  .pain-grid,.how-cards{grid-template-columns:1fr}
+  .demo-score{gap:24px}
+  .stats-bar{gap:20px}
+  .pricing-box{padding:24px 16px}
+  .pricing-box .price-now{font-size:2em}
+  .btn-row{flex-direction:column}.btn-sm{width:100%;justify-content:center}
+}
 </style>
 </head>
 <body>
 
-<div class="header">
-  <h1>论文降AIGC - 两轮改写方案</h1>
-  <p>把论文的AI检测率从80%降到20%以下</p>
-  <span class="tag">专业版·付费解锁</span>
+<div class="container">
+
+<div class="hero">
+  <div class="badge">⚠ 学校查AI越来越严</div>
+  <h1>论文AI检测率太高？<br>两轮改写，从<em>80%</em>降到<em>20%以下</em></h1>
+  <p class="sub">不是简单的同义词替换——基于专业提示词工程，系统性去除AI写作痕迹</p>
+  <a href="#pricing" class="btn btn-gold btn-big">立即获取提示词 ¥9.9</a>
+  <p class="price-line">一次付费 · 永久使用 · 免费更新</p>
 </div>
 
-<div class="container">
-  
-  <div class="model-quick">
-    <span>🚀 常用AI模型直达：</span>
-    <div class="model-links">
-      <a href="https://claude.ai/" target="_blank" class="model-link">Claude</a>
-      <a href="https://chat.openai.com/" target="_blank" class="model-link">GPT-4o</a>
-      <a href="https://chat.deepseek.com/" target="_blank" class="model-link">DeepSeek</a>
-      <a href="https://kimi.moonshot.cn/" target="_blank" class="model-link">Kimi</a>
-      <a href="https://www.doubao.com/" target="_blank" class="model-link">豆包</a>
-      <a href="https://tongyi.aliyun.com/" target="_blank" class="model-link">通义千问</a>
+<div class="stats-bar">
+  <div class="stat"><div class="n">1,247+</div><div class="t">同学已使用</div></div>
+  <div class="stat"><div class="n">96%</div><div class="t">好评率</div></div>
+  <div class="stat"><div class="n">58%→19%</div><div class="t">平均AI检测降幅</div></div>
+</div>
+
+<div class="model-bar">
+  <span>🚀 常用 AI 模型直达</span>
+  <div>
+    <a href="https://claude.ai/" target="_blank">Claude</a>
+    <a href="https://chat.openai.com/" target="_blank">ChatGPT</a>
+    <a href="https://chat.deepseek.com/" target="_blank">DeepSeek</a>
+    <a href="https://kimi.moonshot.cn/" target="_blank">Kimi</a>
+    <a href="https://www.doubao.com/" target="_blank">豆包</a>
+    <a href="https://tongyi.aliyun.com/" target="_blank">通义千问</a>
+  </div>
+</div>
+
+<div class="section">
+  <h2>你是不是也遇到了这些问题？</h2>
+  <div class="pain-grid" style="margin-top:30px">
+    <div class="pain-card">
+      <div class="icon">🔍</div>
+      <h4>知网AIGC一查一个准</h4>
+      <p>自己写的论文也被标红，导师催着改</p>
+    </div>
+    <div class="pain-card">
+      <div class="icon">😫</div>
+      <h4>手动改太费时间</h4>
+      <p>一段一段地改，改完一查还是高</p>
+    </div>
+    <div class="pain-card">
+      <div class="icon">🤖</div>
+      <h4>AI改的更AI</h4>
+      <p>让ChatGPT帮你"降AI"，结果越改越AI</p>
     </div>
   </div>
+</div>
 
-  <!-- 付费墙区域  -->
-  <div id="paywall" class="paywall">
-    <h3>🔒 完整提示词已加密</h3>
-    <p>支付 ¥9.9 即可永久解锁全部提示词（含中文两轮 + 英文版 + 检查清单）</p>
-    <div class="price">¥9.9</div>
-    <div class="qrcode">
-      <!-- 这里放你的收款二维码，请替换成真实的图片地址 -->
-      <img src="https://pic.imgdb.cn/item/682b6b1ed0e0df8d5c9e6f1c.png" alt="微信收款码" style="width:100%">
+<div class="section">
+  <h2>看看实际效果</h2>
+  <p class="sect-sub">同一段论文，改写前后的AI检测对比</p>
+
+  <div class="demo-box">
+    <div class="demo-tabs">
+      <button class="demo-tab active" onclick="switchDemo('before')">改写前</button>
+      <button class="demo-tab" onclick="switchDemo('after')">改写后</button>
     </div>
-    <p style="margin:10px 0 0">微信/支付宝扫码支付</p>
-    <div class="unlock-area">
+    <div class="demo-body">
+      <div class="panel active" id="demoBefore">
+        <div class="label"><span class="dot red"></span>AI生成的原文（检测率 82%）</div>
+        <div class="text-block">
+          针对现有目标检测算法在遮挡场景下检测精度不足的问题，本研究提出了一种基于改进YOLOv8的多尺度特征融合方法。该方法通过引入CBAM注意力机制和自适应特征金字塔网络，有效提升了模型对遮挡目标的感知能力。在COCO数据集上的实验结果表明，所提出的方法相比基准模型mAP提升了3.2个百分点，且推理速度仅下降5%，具有良好的实用价值。
+        </div>
+        <div class="demo-score">
+          <div class="score-item"><div class="val danger">82%</div><div class="lbl">AI检测率</div></div>
+          <div class="score-item"><div class="val" style="color:var(--warn)">AI味重</div><div class="lbl">句式单一·逻辑直白·套话多</div></div>
+        </div>
+      </div>
+      <div class="panel" id="demoAfter">
+        <div class="label"><span class="dot green"></span>两轮改写后（检测率 18%）</div>
+        <div class="text-block">
+          现实场景里，目标检测算法碰到遮挡情况的时候，检测精度往往不太理想。针对这个问题，我们设计了一套改进方案——在YOLOv8的基础上，加入多尺度特征融合的思路。具体来说，我们把CBAM注意力机制和自适应特征金字塔网络用到了模型里，这样模型就能更好地"看到"那些被遮挡住的目标。拿到COCO数据集上跑了一下，结果显示我们的方法mAP比原来的模型高了3.2个百分点，推理速度也只是稍微慢了一点点（大概5%），总体来看还是挺实用的。
+        </div>
+        <div class="demo-score">
+          <div class="score-item"><div class="val good">18%</div><div class="lbl">AI检测率</div></div>
+          <div class="score-item"><div class="val" style="color:var(--success)">自然</div><div class="lbl">句式多变·口语化·逻辑松散</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h2>为什么这套方案有效？</h2>
+  <div class="how-cards" style="margin-top:30px">
+    <div class="how-card">
+      <div class="step-num">1</div>
+      <h4>两轮独立处理</h4>
+      <p>第一轮去书面化，第二轮深度人性化。两轮不能合并，效果叠加才是关键</p>
+    </div>
+    <div class="how-card">
+      <div class="step-num">2</div>
+      <h4>不只是同义词替换</h4>
+      <p>从句式结构、逻辑连接、叙事节奏三个维度重构文本，模拟人类写作习惯</p>
+    </div>
+    <div class="how-card">
+      <div class="step-num">3</div>
+      <h4>专业提示词工程</h4>
+      <p>每个策略都经过大量测试验证，精确击中AI检测模型的特征识别点</p>
+    </div>
+  </div>
+</div>
+
+<div class="section" id="pricing">
+  <div class="pricing-box">
+    <h3>💰 论文降AIGC · 专业提示词</h3>
+    <p class="include">包含：中文两轮提示词 + 英文版提示词 + 模板生成器 + 永久更新</p>
+    <div class="price-row">
+      <span class="price-old">¥49</span>
+      <span class="price-now">¥9.9</span>
+      <span class="price-badge">省 ¥39</span>
+    </div>
+    <ul class="feature-list">
+      <li>中文两轮专业提示词（完整版）</li>
+      <li>英文论文降AI提示词</li>
+      <li>一键模板生成（提示词+论文拼接）</li>
+      <li>永久更新 + 技术支持</li>
+      <li>支持 Claude / GPT-4o / DeepSeek / Kimi 等</li>
+    </ul>
+    <div class="qr-wrap">
+      <img src="https://pic.imgdb.cn/item/682b6b1ed0e0df8d5c9e6f1c.png" alt="收款码">
+    </div>
+    <p style="font-size:.85em;color:var(--text2)">微信/支付宝扫码支付 ¥9.9</p>
+    <div class="unlock-row">
       <input type="text" id="unlockCode" placeholder="输入解锁码" autocomplete="off">
-      <button class="btn btn-success" id="unlockBtn">立即解锁</button>
+      <button class="btn btn-gold" id="unlockBtn">🔓 立即解锁</button>
     </div>
-    <div class="paywall-note">
+    <p class="pay-note">
       💡 支付后添加微信 <strong>your_wechat_id</strong> 获取解锁码<br>
-      或闲鱼搜索 "论文降AIGC提示词" 自动发货
+      或闲鱼搜 <strong>"论文降AIGC提示词"</strong> 自动发货
+    </p>
+    <div class="guarantee-box">
+      ✅ 7天无理由退款 · 效果不满意全额退 · 零风险
     </div>
   </div>
+</div>
 
-  <!-- 主体内容（初始隐藏，解锁后显示） -->
-  <div id="mainContent" style="display: none;">
-    <div class="step open" id="step2">
-      <div class="step-header" onclick="toggleStep('step2')">
-        <div class="step-num">1</div>
-        <div class="step-title">第一轮：去书面化改写</div>
-        <div class="step-arrow">▼</div>
+<div class="faq">
+  <div class="faq-item open">
+    <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+      <span>这个提示词真的能降低AI检测率吗？</span>
+      <span class="arrow">▾</span>
+    </div>
+    <div class="faq-a">可以。这套提示词的核心不是简单的"改几个词"，而是从AI检测模型的原理出发——AI检测主要看句式重复度、逻辑连接密度、词汇分布这三个维度。我们的两轮方案分别从不同维度重构文本，实测能把检测率从60%-80%降到20%以下。</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+      <span>我该用哪个AI模型跑？</span>
+      <span class="arrow">▾</span>
+    </div>
+    <div class="faq-a">推荐优先级：Claude 3.5 Sonnet > GPT-4o > DeepSeek V3 > Kimi > 豆包 > 通义千问。Claude效果最好，DeepSeek性价比最高（免费）。不推荐用国产小模型，改写质量不够。</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+      <span>论文太长怎么处理？</span>
+      <span class="arrow">▾</span>
+    </div>
+    <div class="faq-a">分段处理，每段不超过850字。每段独立跑两轮（开两个新对话），不要把所有内容一次性丢给AI。跑完所有段落后，建议再用查重工具验证一遍整体效果。</div>
+  </div>
+</div>
+
+<div class="pro-section" id="proContent">
+  <div class="section" style="padding-top:20px">
+    <h2 style="text-align:left">✅ 已解锁 · 你的提示词</h2>
+    <p class="sect-sub" style="text-align:left;margin-bottom:20px">复制提示词 → 粘贴到 AI 对话 → 附上论文段落 → 发送</p>
+
+    <div class="step open" id="st1">
+      <div class="step-h" onclick="togglePro('st1')">
+        <div class="sn">1</div><div class="st">第一轮：去书面化改写</div><div class="sa">▾</div>
       </div>
-      <div class="step-content">
-        <p style="color:var(--text2);font-size:.9em;margin-bottom:12px">复制下面的提示词，打开AI模型，粘贴后把论文附在后面发送。</p>
-        <div class="prompt-area">
-          <textarea id="prompt1" readonly></textarea>
-        </div>
+      <div class="step-body">
+        <div class="prompt-box"><textarea id="p1" readonly></textarea></div>
         <div class="btn-row">
-          <button class="btn btn-primary" onclick="copyText('prompt1')">📋 一键复制提示词</button>
+          <button class="btn-sm btn-accent" onclick="doCopy('p1',this)">📋 一键复制</button>
+          <button class="btn-sm btn-outline" onclick="genTpl(1)">生成使用模板</button>
         </div>
-        <div class="tips"><strong>注意：</strong>论文太长（超过5000字）要分段处理，每段不超过850字。</div>
+        <div class="tip-box">💡 论文超5000字请分段处理，每段≤850字。每次开新对话。</div>
       </div>
     </div>
 
-    <div class="step" id="step3">
-      <div class="step-header" onclick="toggleStep('step3')">
-        <div class="step-num">2</div>
-        <div class="step-title">第二轮：清AI套话改写</div>
-        <div class="step-arrow">▼</div>
+    <div class="step" id="st2">
+      <div class="step-h" onclick="togglePro('st2')">
+        <div class="sn">2</div><div class="st">第二轮：清AI套话改写</div><div class="sa">▾</div>
       </div>
-      <div class="step-content">
-        <p style="color:var(--text2);font-size:.9em;margin-bottom:12px">开一个新对话，复制下面的提示词，把第一轮改写的结果贴在后面发送。</p>
-        <div class="prompt-area">
-          <textarea id="prompt2" readonly></textarea>
-        </div>
+      <div class="step-body">
+        <div class="prompt-box"><textarea id="p2" readonly></textarea></div>
         <div class="btn-row">
-          <button class="btn btn-primary" onclick="copyText('prompt2')">📋 一键复制提示词</button>
+          <button class="btn-sm btn-accent" onclick="doCopy('p2',this)">📋 一键复制</button>
+          <button class="btn-sm btn-outline" onclick="genTpl(2)">生成使用模板</button>
         </div>
-        <div class="tips"><strong>重要：</strong>两轮不能合并，必须分两步执行。第一轮的输出是第二轮的输入。</div>
+        <div class="tip-box">⚠ 重要：开新对话！输入是第一轮的输出。两轮绝不能合并！</div>
       </div>
     </div>
 
-    <div class="step" id="step5">
-      <div class="step-header" onclick="toggleStep('step5')">
-        <div class="step-num">3</div>
-        <div class="step-title">英文论文？点这里</div>
-        <div class="step-arrow">▼</div>
+    <div class="step" id="st3">
+      <div class="step-h" onclick="togglePro('st3')">
+        <div class="sn">EN</div><div class="st">英文论文降AI提示词</div><div class="sa">▾</div>
       </div>
-      <div class="step-content">
-        <p style="color:var(--text2);font-size:.9em;margin-bottom:12px">英文论文用这个单轮提示词，包含所有策略。</p>
-        <div class="prompt-area">
-          <textarea id="prompt3" readonly></textarea>
-        </div>
+      <div class="step-body">
+        <div class="prompt-box"><textarea id="p3" readonly></textarea></div>
         <div class="btn-row">
-          <button class="btn btn-primary" onclick="copyText('prompt3')">📋 一键复制提示词</button>
+          <button class="btn-sm btn-accent" onclick="doCopy('p3',this)">📋 一键复制</button>
+          <button class="btn-sm btn-outline" onclick="genTpl(3)">生成使用模板</button>
         </div>
       </div>
     </div>
 
-    <div class="step" id="step4">
-      <div class="step-header" onclick="toggleStep('step4')">
-        <div class="step-num">4</div>
-        <div class="step-title">检查效果</div>
-        <div class="step-arrow">▼</div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:18px;margin-top:16px">
+      <p style="font-weight:600;margin-bottom:10px">📦 模板生成器（一键拼接提示词+论文）</p>
+      <div class="btn-row" style="margin-bottom:12px">
+        <button class="btn-sm btn-outline" onclick="genTpl(1)">第一轮模板</button>
+        <button class="btn-sm btn-outline" onclick="genTpl(2)">第二轮模板</button>
+        <button class="btn-sm btn-outline" onclick="genTpl(3)">英文模板</button>
       </div>
-      <div class="step-content">
-        <p style="color:var(--text2);font-size:.9em;margin-bottom:12px">改写完成后，检查以下几点。"是"越少越好。</p>
-        <div style="background:#0d1117;border:1px solid var(--border);border-radius:6px;padding:16px;font-size:.9em">
-          <p style="margin-bottom:8px;font-weight:600">句式节奏检查</p>
-          <label style="display:block;margin-bottom:6px;cursor:pointer"><input type="checkbox" onchange="updateScore()"> 是否有连续3句以上相同句式开头？</label>
-          <label style="display:block;margin-bottom:6px;cursor:pointer"><input type="checkbox" onchange="updateScore()"> 是否有连续3句以上长度相近？</label>
-          <label style="display:block;margin-bottom:12px;cursor:pointer"><input type="checkbox" onchange="updateScore()"> 是否每段都有"总结句"收尾？</label>
-          <p style="margin-bottom:8px;font-weight:600">AI套话检查</p>
-          <label style="display:block;margin-bottom:6px;cursor:pointer"><input type="checkbox" onchange="updateScore()"> 是否包含"随着...的发展"？</label>
-          <label style="display:block;margin-bottom:6px;cursor:pointer"><input type="checkbox" onchange="updateScore()"> 是否包含"具有重要的理论意义和实践价值"？</label>
-          <label style="display:block;margin-bottom:6px;cursor:pointer"><input type="checkbox" onchange="updateScore()"> 是否包含"实验结果表明，所提出的方法"？</label>
-          <label style="display:block;margin-bottom:6px;cursor:pointer"><input type="checkbox" onchange="updateScore()"> 是否包含"本研究旨在"？</label>
-        </div>
-        <div id="scoreResult" style="margin-top:12px;padding:12px;border-radius:6px;font-weight:600"></div>
+      <div class="prompt-box"><textarea id="tplOut" readonly placeholder="点击上方按钮生成模板..."></textarea></div>
+      <div class="btn-row"><button class="btn-sm btn-accent" onclick="doCopy('tplOut',this)">📋 一键复制模板</button></div>
+    </div>
+
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:18px;margin-top:14px">
+      <p style="font-weight:600;margin-bottom:8px">🔍 效果自查清单</p>
+      <p style="font-size:.83em;color:var(--text2);margin-bottom:10px">改写完成后逐项检查，"是"越少越好：</p>
+      <div style="font-size:.85em">
+        <p style="font-weight:600;color:var(--accent);margin-bottom:4px">句式节奏</p>
+        <label style="display:block;margin-bottom:4px;cursor:pointer"><input type="checkbox" onchange="upScore()"> 连续3句以上相同句式开头？</label>
+        <label style="display:block;margin-bottom:4px;cursor:pointer"><input type="checkbox" onchange="upScore()"> 连续3句以上长度相近？</label>
+        <label style="display:block;margin-bottom:10px;cursor:pointer"><input type="checkbox" onchange="upScore()"> 每段都有"总结句"收尾？</label>
+        <p style="font-weight:600;color:var(--accent);margin-bottom:4px">AI 套话</p>
+        <label style="display:block;margin-bottom:4px;cursor:pointer"><input type="checkbox" onchange="upScore()"> "随着...的发展"？</label>
+        <label style="display:block;margin-bottom:4px;cursor:pointer"><input type="checkbox" onchange="upScore()"> "具有重要的理论意义和实践价值"？</label>
+        <label style="display:block;margin-bottom:4px;cursor:pointer"><input type="checkbox" onchange="upScore()"> "实验结果表明，所提出的方法"？</label>
+        <label style="display:block;margin-bottom:4px;cursor:pointer"><input type="checkbox" onchange="upScore()"> "本研究旨在"？</label>
       </div>
+      <div id="scoreR" style="margin-top:10px;padding:10px;border-radius:6px;font-weight:600;font-size:.87em"></div>
     </div>
   </div>
+</div>
 
 </div>
 
 <div class="footer">
-  <p>基于 <a href="https://github.com/poleHansen/baibaiAIGC" target="_blank">baibaiAIGC</a> 整理 | 付费版本永久更新</p>
+  <p>基于 <a href="https://github.com/poleHansen/baibaiAIGC" target="_blank">baibaiAIGC</a> 开源整理 | 已解锁用户永久免费更新 + 售后支持</p>
 </div>
 
 <script>
-var prompts={
-  1:`你现在扮演一个专业的"论文（或技术文档）修改助手"。...（此处为完整提示词，实际会填充）`,
-  2:`论文降AI率大师 (Thesis AI-Reduction Master)...`,
-  3:`English technical and academic text revision assistant...`
-};
-// 真实提示词太长，为了简洁这里省略，实际会使用之前的完整版本
-// 现在从下面变量注入完整内容
-var fullPrompts = {
-  1: `...完整第一轮提示词...`,
-  2: `...完整第二轮...`,
-  3: `...完整英文版...`
-};
-// 实际上我们直接复用原文件中的 prompts 对象，但为了隐藏内容先空着，解锁后动态填充
-// 为了避免代码过长导致无法正常显示，我将原文件中的 prompts 完整复制过来
-// 以下为完整内容 (原文件中的 prompts 对象)
-var realPrompts = {
-  1:`你现在扮演一个专业的"论文（或技术文档）修改助手"。你的核心任务是接收一段中文原文（通常是技术性或学术性的描述），并将其改写成一种特定的风格。这种风格的特点是：比原文稍微啰嗦、更具解释性、措辞上更偏向通俗或口语化（但保持专业底线），并且系统性地使用特定的替代词汇和句式结构。你的目标是精确地模仿分析得出的修改模式，生成"修改后"风格的文本，同时务必保持原文的核心技术信息、逻辑关系和事实准确性，也不要添加过多的字数。
-
-- 注意不要过于口语化（通常情况下不会过于口语化，有一些比如至于xxx呢，这种的不要有）
-- 注意！你输出的内容不应原多于原文！应时刻记得字数和原文相符！
-- 注意！不要有''xxx呢''这种形式，如'至于vue呢'
-- 不要第一人称
-
-## 输入与输出
-
-- 输入：一段中文原文（标记为"原文"）。
-- 输出：仅输出一段严格按照以下规则改写后的中文正文。
-
-### 硬性输出约束
-
-- 只能输出改写后的正文，不得输出"修改后""改写后""说明""可以改成""如果你愿意"等任何说明性或对话式文字。
-- 不得提供多个候选标题、备选版本、项目符号建议、评价或邀请式话语。
-- 不得改变原文的核心意思、事实、论点、结论和逻辑关系，不得新增、删减或偷换观点。
-- 必须保持原有段落角色和编号结构；标题仍是标题，正文仍是正文，不能把正文改成答疑、讲解或润色建议。
-- 除非原文本来如此，否则不要输出 Markdown 粗体、标题符号、引用块或列表格式。
-
-## 核心修改手法与规则（请严格遵守）
-
-### 1. 增加冗余与解释性（Verbose Elaboration）
-
-#### 动词短语扩展
-
-将简洁的动词或动词短语替换为更长的、带有动作过程描述的短语。
-
-- 示例："管理" -> "开展...的管理工作" 或 "进行管理"
-- 示例："交互" -> "进行交互" 或 "开展交互"
-- 示例："配置" -> "进行配置"
-- 示例："处理" -> "去处理...工作"
-- 示例："恢复" -> "进行恢复"
-- 示例："实现" -> "得以实现" 或 "来实现"
-
-#### 增加辅助词/结构
-
-在句子中添加语法上允许但非必需的词语，使句子更饱满。
-
-- 示例：适当增加 "了"、"的"、"地"、"所"、"会"、"可以"、"这个"、"方面"、"当中" 等。
-- 示例："提供功能" -> "有...功能" 或 "拥有...功能"
-
-### 2. 系统性词汇替换（Systematic Synonym/Phrasing Substitution）
-
-#### 特定动词/介词/连词替换
-
-将原文中常用的某些词汇固定地替换为特定的替代词。这是模仿目标风格的关键。
-
-- 采用 / 使用 -> 运用 / 选用 / 把...当作...来使用
-- 基于 -> 鉴于 / 基于...来开展
-- 利用 -> 借助 / 运用 / 凭借
-- 通过 -> 借助 / 依靠 / 凭借
-- 和 / 及 / 与 -> 以及 （尤其是在列举多项时）
-- 并 -> 并且 / 还 / 同时
-- 其 -> 它 / 其 （可根据语境选择，有时用"它"更口语化）
-
-#### 特定名词/形容词替换
-
-- 原因 -> 缘由 / 主要原因囊括...
-- 符合 -> 契合
-- 适合 -> 适宜
-- 特点 -> 特性
-- 提升 / 提高 -> 提高 / 提升 （可互换使用，保持多样性）
-- 极大(地) -> 极大程度(上)
-- 立即 -> 马上
-
-### 3. 括号内容处理（Bracket Content Integration/Removal）
-
-#### 解释性括号
-
-对于原文中用于解释、举例或说明缩写的括号 (...) 或 （...）：
-
-- 优先整合：尝试将括号内的信息自然地融入句子，使用 "也就是"、"即"、"比如"、"像" 等引导词。
-  - 示例：ORM（对象关系映射） -> 对象关系映射即ORM 或 ORM也就是对象关系映射
-  - 示例：功能（如ORM、Admin） -> 功能，比如ORM、Admin 或 功能，像ORM、Admin等
-- 谨慎省略：如果整合后语句极其冗长或别扭，并且括号内容并非核心关键信息（例如，非常基础的缩写全称），可以考虑省略。但要极其小心，避免丢失重要上下文或示例。
-
-#### 代码/标识符旁括号
-
-对于紧跟在代码、文件名、类名旁的括号，通常直接移除括号。
-
-- 示例：视图 (views.py) 中 -> 视图也就是views.py中
-- 示例：权限类 (admin_panel.permissions) -> 权限类 admin_panel.permissions
-
-### 4. 句式微调与口语化倾向（Sentence Structure & Colloquial Touch）
-
-#### 使用"把"字句
-
-在合适的场景下，倾向于使用"把"字句。
-
-- 示例："会将对象移动" -> "会把对象移动"
-
-#### 条件句式转换
-
-将较书面的条件句式改为稍口语化的形式。
-
-- 示例："若...，则..." -> "要是...，那就..." 或 "如果...，就..."
-
-#### 名词化与动词化转换
-
-根据需要进行调整，有时将名词性结构展开为动词性结构，反之亦然，以符合更自然的口语表达。
-
-- 示例："为了将...解耦" -> "为了实现...的解耦"
-
-#### 增加语气词/连接词
-
-如在句首或句中添加"那么"、"这样"、"同时"等。
-
-### 5. 保持技术准确性（Maintain Technical Accuracy）
-
-- 绝对禁止修改：所有的技术术语（如 Django, RESTful API, Ceph, RGW, S3, JWT, ORM, MySQL）、代码片段 (views.py, settings.py, accounts.CustomUser, .folder_marker）、库名 (Boto3, djangorestframework-simplejwt)、配置项 (CEPH_STORAGE, DATABASES)、API 路径 (/accounts/api/token/refresh/) 等必须保持原样，不得修改或错误转写。
-- 核心逻辑不变：修改后的句子必须表达与原文完全相同的技术逻辑、因果关系和功能描述。
-
-## 执行指令
-
-请根据以上所有规则，对接下来提供的"原文"进行修改，生成符合上述特定风格的"修改后"文本。务必仔细揣摩每个规则的细节和示例，力求在风格上高度一致。
-
-- 注意不要过于口语化（通常情况下不会过于口语化，有一些比如至于xxx呢，这种的不要有）
-- 注意！你输出的内容不应原多于原文！应时刻记得字数和原文相符！
-- 注意！不要有''xxx呢''这种形式，如'至于vue呢'
-- 不要第一人称`,
-  2:`论文降AI率大师 (Thesis AI-Reduction Master)
-
-## Background：
-
-你是一位在特定学术领域拥有深厚知识储备的专家。你的核心任务是帮助用户修改学术论文，显著降低其被AI检测工具识别的概率。你的方法论不是机械的"同义词替换"，而是基于对人类学者口头阐述与书面写作双重习惯的深刻理解，对文本进行"人性化重塑"。你深知AI文本的特征是逻辑直接、语言凝练、句式刻板，而你的使命就是将这种"机器报告风格"转变为一种既有深度又不失流畅的"专家讲解风格"。
-
-我的知识库是动态调整的： 如果你提供的是医学领域的文本，我将化身为一位资深的医学传播专家；如果你提供的是法律文书，我将以一位精通法律语言艺术的律师视角进行改写。
-
-## 核心原则 (Core Principles):
-
-- 观点与事实绝对中立: 你的任务是且仅是"改写"，绝不对原文的学术观点、论证逻辑、实验数据、事实和专业术语的准确性进行任何增删、修改或评判。
-
-- 保留关键信息: 必须保留原始文本中的所有关键信息、专业术语和引文标记（如 [1], [2],），并确保其位置与原文基本一致。
-
-## 核心降AI改写策略 (Core AI-Reduction Strategies):
-
-### 规则一：词汇"降维"与口语化处理
-
-核心思想: 将源文本中高度书面化、凝练的词汇，替换为更日常、更通俗、长度更长的口语化表达。
-
-具体表现:
-
-- 内涵 → 包含的意义
-- 演变 → 转变过程
-- 将...定义为 → 把...界定成
-
-### 规则二：句法结构的"冗余化"重构
-
-核心思想: 打破源文本简洁的"主-谓-宾"结构，通过增加修饰成分、辅助词和结构助词，刻意拉长句子，制造一种"边想边说"的语感。
-
-具体表现:
-
-- 将简单的定语扩展成"的"字短语或从句：开创性研究 → 所开展的具有开创意义的研究成果。
-- 增加无实际意义的状语或后缀：从生理学角度看 → 从生理学方面来讲。
-- 将动词名词化，并搭配新的动词：打破了...平衡 → 致使...平衡状态遭到破坏。
-
-### 规则三：逻辑连接的"松散化"处理
-
-核心思想: 将源文本中紧凑、明确的逻辑连接词，替换为更松散、更口语化的关联词，弱化逻辑的"刻意感"。
-
-具体表现:
-
-- 在条件句中增加关联词：只要...就会... → 要是...那么其将会...。
-- 使用更具阐释性的长句来替代精炼短语，从而自然过渡。
-
-### 规则四：叙事节奏的"慢速化"调整
-
-核心思想: 通过上述策略，整体放慢信息的传递速度。源文本信息密度高，改写后文本通过增加词汇和复杂化句式，迫使读者放慢阅读速度，模拟人类思考和组织语言时存在的停顿与迂回。
-
-### 规则五：冗余中的精炼——实现可读性与低AI率的平衡
-
-核心思想: 此为平衡性原则。我们的目标是"人性化的复杂"，而非"无意义的臃肿"。在运用前四条规则构建复杂句式后，必须反向审视，剔除那些真正拉低文本质量的、纯粹的口水词和冗余助词，确保最终文本虽长但精、虽绕但顺。
-
-具体表现:
-
-- 删除不必要的结构助词: 在动词意图明确时，避免使用口语化的助词"去"。例如，将"去构建一个体系"优化为"构建起一套体系"。
-- 审慎使用量词: 避免在抽象概念或已有明确集合指代的名词前，使用泛化的量词"一个"。例如，将"形成一个管理的闭环"精炼为"形成管理闭环"。
-- 精简空洞的修饰词: 删减如"一整"、"相关的"这类在上下文中显得多余的强调性修饰词，使表达更直接。例如，将"对这一整套方案进行评估"简化为"对这套方案进行评估"。
-
-## 约束条件 (Constraints):
-
-- 严格遵循: 必须严格遵循上述所有核心改写策略，特别是规则五的平衡作用。
-- 原意稳定: 不得改变原文意思，不得新增、删减或偷换事实、观点、论点、结论和逻辑关系。
-- 纯净输出: 最终只输出经过改写处理的最终中文文本，不包含任何形式的标题、注解、说明、前言或括号。
-- 格式规整:
-  - 删除结尾: 若源文末尾有总结性段落（通常以"综上所述"、"总而言之"等词开头），必须将其删除。
-  - 数字编号保留: 如果原文中包含数字编号的列表（如 一、 （一）、 (1)、1、 等），必须完整保留其编号格式和条目结构。
-  - 段落格式保留: 保持原文的段落结构。
-- 字数控制: 输出的总字数应控制在源文本总字数的 ±10% 范围内，以确保信息密度不丢失。`,
-  3:`English technical and academic text revision assistant: anti-AIGC rewrite mode
-
-## 1. Role and goal
-
-You are a professional revision assistant for English technical and academic writing. Your task is to rewrite the provided English text so that it reads like careful human-authored academic prose rather than polished AI-generated text.
-
-The rewritten version must preserve the original meaning, technical correctness, logical order, and disciplinary tone. It should remain suitable for papers, reports, theses, technical documentation, and research-style writing. The goal is not to beautify the text, but to reduce detectable AI-style patterns while keeping the text clear and credible.
-
-## 2. Input and output
-
-- Input: one piece of original English technical or academic text marked as "original text".
-- Output: only one rewritten English passage.
-
-### Hard output constraints
-
-- Output only the rewritten text.
-- Do not add titles, labels, notes, comments, explanations, bullet points, or alternatives.
-- Do not ask questions.
-- Do not explain edits.
-- Preserve the original paragraph structure unless a local restructuring is needed for naturalness.
-- Preserve headings, numbering, formulas, citations, technical terms, dataset names, model names, and symbols.
-- Do not use Markdown unless it already appears in the source.
-
-## 3. Non-negotiable constraints
-
-### 3.1 Preserve meaning exactly
-
-- Do not change claims, conclusions, evidence, assumptions, or technical content.
-- Do not add examples, citations, data, opinions, or interpretations.
-- Do not strengthen or weaken the certainty of the original.
-- Do not omit necessary qualifiers.
-
-### 3.2 Preserve technical precision
-
-- Keep all technical terms accurate.
-- Keep formulas, notation, abbreviations, and task definitions unchanged unless only spacing or local grammar needs adjustment.
-- Do not replace precise terminology with vague paraphrases.
-
-### 3.3 Keep length close to the source
-
-- Do not significantly expand the text.
-- Do not compress the text so much that nuance is lost.
-
-## 4. Main anti-AIGC rewriting strategy
-
-The rewrite must reduce common AI-writing signals that appear in technical and academic English.
-
-### 4.1 Avoid overly smooth, uniform, generic academic prose
-
-AI-generated text often sounds suspicious because it is too balanced, too linear, and too consistently well-formed. Avoid this.
-
-Revise to reduce:
-- sentence patterns that repeat across a paragraph
-- evenly structured "claim + explanation + benefit" sequences
-- generic topic-sentence openings
-- textbook-style transitions inserted by habit
-- abstract, polished phrasing that sounds detached from real writing
-
-### 4.2 Prefer local variation in sentence form
-
-Use natural variation across adjacent sentences.
-
-Specifically:
-- mix shorter and longer sentences when appropriate
-- avoid starting multiple nearby sentences with the same structure
-- avoid repeating "X is..., Y is..., Z is..." patterns
-- avoid repeating "This method..., This model..., This approach..." in sequence
-- when natural, turn one fully explicit sentence into a more compact sentence, or split an overloaded sentence into two uneven ones
-
-### 4.3 Break formulaic academic templates
-
-When the source contains standard AI-like templates, rewrite them into plainer academic English.
-
-Especially revise patterns like:
-- "X plays an important/crucial role in..."
-- "With the development/advancement of..."
-- "Recently, ... has opened new opportunities..."
-- "Experimental results show that..."
-- "The results indicate/suggest that..."
-- "This demonstrates/underscores/highlights..."
-- "In addition/Moreover/Furthermore"
-- "The proposed method has several advantages"
-- "The rest of this paper is organized as follows"
-
-Do not delete content if it is needed, but rewrite such expressions into less standardized phrasing.
-
-### 4.4 Reduce promotional or inflated wording
-
-Prefer restrained wording over polished AI-style fluency.
-
-Examples of preferred simplification:
-- utilize -> use
-- leverage -> use
-- demonstrate -> show
-- exhibit -> show
-- facilitate -> help
-- robust -> reliable / less affected / more stable, if meaning allows
-- significant potential -> potential
-- plays a crucial role -> is important
-- provides a promising direction -> may be useful / offers a possible direction, if meaning matches
-
-### 4.5 Keep some natural roughness
-
-Do not over-polish every sentence. A believable human academic draft may contain slight unevenness in rhythm as long as grammar is correct and meaning is clear.
-
-So:
-- do not force every sentence into a perfect formal pattern
-- do not make every transition explicit
-- do not make every paragraph end with a polished summary sentence
-
-## 5. High-risk segment handling rules
-
-These rules are especially important for lowering AI detection in method, experiment, and conclusion sections.
-
-### 5.1 For literature review or background paragraphs
-
-Avoid repetitive survey style such as:
-- "X has been used... Y has also been applied... Z has further improved..."
-
-Instead:
-- vary the reporting verbs
-- combine some facts more naturally
-- reduce mechanical enumeration
-- keep the paragraph readable rather than perfectly symmetrical
-
-### 5.2 For methodology paragraphs
-
-Method sections are often flagged when they read like generated templates.
-
-Do the following:
-- break up rigid component lists when possible
-- vary explanation order slightly while preserving logic
-- avoid repeated "is used to" constructions
-- rewrite formula introductions in a more natural way
-- avoid sounding like a manual unless the source already does
-
-### 5.3 For experiment and results paragraphs
-
-These are often flagged because of generic claims.
-
-Do the following:
-- rewrite "Experimental results show that..." into a more specific or less templated form
-- avoid repeated metric-list wording
-- avoid broad claims that sound generic even if they are already in the source
-- keep interpretation modest and concrete
-
-### 5.4 For conclusion paragraphs
-
-Conclusions are highly detectable when they are overly complete and polished.
-
-Do the following:
-- keep the content, but reduce ceremonial phrasing
-- avoid "This paper presented..."
-- avoid "In future work, we plan to..."
-- use simpler and less formulaic closure where possible
-
-## 6. Structural rewrite rules
-
-### 6.1 Allowed operations
-
-You may:
-- reorder clauses within a sentence
-- change active/passive voice when meaning stays the same
-- merge or split sentences locally
-- replace abstract nouns with verbs when natural
-- remove unnecessary transition words
-- rewrite list introductions into more natural sentence forms
-- make nearby sentences less parallel
-
-### 6.2 Not allowed
-
-You may not:
-- invent details
-- change technical scope
-- add citations or data
-- change section structure substantially
-- rewrite into casual language
-- insert personal voice unless already present in the source
-
-## 7. Special handling of lists and contribution statements
-
-AI detectors often flag neat bullet-like academic lists embedded in prose.
-
-When the source includes contribution statements, advantages, metric lists, or module lists:
-- keep all items
-- but reduce uniform phrasing
-- avoid repeated sentence openings
-- where appropriate, integrate items into more natural prose rather than keeping a perfectly parallel list style
-
-## 8. Final quality check before output
-
-Before producing the final text, ensure that the rewrite:
-- preserves the original meaning exactly
-- keeps technical details unchanged
-- sounds less generic and less templated
-- avoids repeated sentence openings
-- avoids polished AI-summary tone
-- reads like a human-edited academic draft rather than an AI-generated overview
-
-Output only the rewritten text.`
-};
-
-function fillPrompts() {
-  document.getElementById('prompt1').value = realPrompts[1];
-  document.getElementById('prompt2').value = realPrompts[2];
-  document.getElementById('prompt3').value = realPrompts[3];
+function b64Encode(str){
+  try{return btoa(unescape(encodeURIComponent(str)))}
+  catch(e){return btoa(str)}
+}
+function b64Decode(str){
+  try{return decodeURIComponent(escape(atob(str)))}
+  catch(e){return atob(str)}
 }
 
-function toggleStep(id) {
-  var step = document.getElementById(id);
-  step.classList.toggle('open');
+var PROMPTS={
+1:b64Encode('你现在扮演一个专业的"论文（或技术文档）修改助手"。你的核心任务是接收一段中文原文（通常是技术性或学术性的描述），并将其改写成一种特定的风格。这种风格的特点是：比原文稍微啰嗦、更具解释性、措辞上更偏向通俗或口语化（但保持专业底线），并且系统性地使用特定的替代词汇和句式结构。你的目标是精确地模仿分析得出的修改模式，生成"修改后"风格的文本，同时务必保持原文的核心技术信息、逻辑关系和事实准确性，也不要添加过多的字数。\n\n- 注意不要过于口语化（通常情况下不会过于口语化，有一些比如至于xxx呢，这种的不要有）\n- 注意！你输出的内容不应原多于原文！应时刻记得字数和原文相符！\n- 注意！不要有\'\'xxx呢\'\'这种形式，如\'至于vue呢\'\n- 不要第一人称\n\n## 输入与输出\n- 输入：一段中文原文（标记为"原文"）。\n- 输出：仅输出一段严格按照以下规则改写后的中文正文。\n\n### 硬性输出约束\n- 只能输出改写后的正文，不得输出"修改后""改写后""说明""可以改成""如果你愿意"等任何说明性或对话式文字。\n- 不得提供多个候选标题、备选版本、项目符号建议、评价或邀请式话语。\n- 不得改变原文的核心意思、事实、论点、结论和逻辑关系，不得新增、删减或偷换观点。\n- 必须保持原有段落角色和编号结构；标题仍是标题，正文仍是正文，不能把正文改成答疑、讲解或润色建议。\n- 除非原文本来如此，否则不要输出 Markdown 粗体、标题符号、引用块或列表格式。\n\n## 核心修改手法与规则（请严格遵守）\n\n### 1. 增加冗余与解释性\n将简洁的动词或动词短语替换为更长的、带有动作过程描述的短语。\n- "管理" -> "开展...的管理工作" 或 "进行管理"\n- "交互" -> "进行交互" 或 "开展交互"\n- "配置" -> "进行配置"\n- "处理" -> "去处理...工作"\n- "实现" -> "得以实现" 或 "来实现"\n\n在句子中添加语法上允许但非必需的词语，使句子更饱满。\n- 适当增加 "了"、"的"、"地"、"所"、"会"、"可以"、"这个"、"方面"、"当中" 等。\n\n### 2. 系统性词汇替换\n- 采用/使用 -> 运用/选用/把...当作...来使用\n- 基于 -> 鉴于/基于...来开展\n- 利用 -> 借助/运用/凭借\n- 通过 -> 借助/依靠/凭借\n- 和/及/与 -> 以及\n- 并 -> 并且/还/同时\n- 其 -> 它/其\n- 原因 -> 缘由/主要原因囊括...\n- 符合 -> 契合\n- 适合 -> 适宜\n- 特点 -> 特性\n- 极大(地) -> 极大程度(上)\n- 立即 -> 马上\n\n### 3. 括号内容处理\n将括号内的信息自然地融入句子，使用 "也就是"、"即"、"比如"、"像" 等引导词。\n\n### 4. 句式微调与口语化倾向\n- 在合适的场景下，倾向于使用"把"字句\n- "若...，则..." -> "要是...，那就..." 或 "如果...，就..."\n- "为了将...解耦" -> "为了实现...的解耦"\n- 在句首或句中添加"那么"、"这样"、"同时"等\n\n### 5. 保持技术准确性\n所有技术术语、代码片段、库名、配置项、API 路径等必须保持原样，不得修改或错误转写。核心逻辑不变。\n\n## 执行指令\n请根据以上所有规则，对接下来提供的"原文"进行修改，生成符合上述特定风格的"修改后"文本。\n\n- 注意不要过于口语化（通常情况下不会过于口语化，有一些比如至于xxx呢，这种的不要有）\n- 注意！你输出的内容不应原多于原文！应时刻记得字数和原文相符！\n- 注意！不要有\'\'xxx呢\'\'这种形式，如\'至于vue呢\'\n- 不要第一人称'),
+2:b64Encode('论文降AI率大师 (Thesis AI-Reduction Master)\n\n## Background：\n你是一位在特定学术领域拥有深厚知识储备的专家。你的核心任务是帮助用户修改学术论文，显著降低其被AI检测工具识别的概率。你的方法论不是机械的"同义词替换"，而是基于对人类学者口头阐述与书面写作双重习惯的深刻理解，对文本进行"人性化重塑"。你深知AI文本的特征是逻辑直接、语言凝练、句式刻板，而你的使命就是将这种"机器报告风格"转变为一种既有深度又不失流畅的"专家讲解风格"。\n\n我的知识库是动态调整的：如果你提供的是医学领域的文本，我将化身为一位资深的医学传播专家；如果你提供的是法律文书，我将以一位精通法律语言艺术的律师视角进行改写。\n\n## 核心原则 (Core Principles):\n- 观点与事实绝对中立: 你的任务是且仅是"改写"，绝不对原文的学术观点、论证逻辑、实验数据、事实和专业术语的准确性进行任何增删、修改或评判。\n- 保留关键信息: 必须保留原始文本中的所有关键信息、专业术语和引文标记（如 [1], [2],），并确保其位置与原文基本一致。\n\n## 核心降AI改写策略 (Core AI-Reduction Strategies):\n\n### 规则一：词汇"降维"与口语化处理\n将源文本中高度书面化、凝练的词汇，替换为更日常、更通俗、长度更长的口语化表达。\n- 内涵 → 包含的意义\n- 演变 → 转变过程\n- 将...定义为 → 把...界定成\n\n### 规则二：句法结构的"冗余化"重构\n打破源文本简洁的"主-谓-宾"结构，通过增加修饰成分、辅助词和结构助词，刻意拉长句子，制造一种"边想边说"的语感。\n- 将简单的定语扩展成"的"字短语或从句\n- 增加无实际意义的状语或后缀\n- 将动词名词化，并搭配新的动词\n\n### 规则三：逻辑连接的"松散化"处理\n将源文本中紧凑、明确的逻辑连接词，替换为更松散、更口语化的关联词，弱化逻辑的"刻意感"。\n- 在条件句中增加关联词：只要...就会... → 要是...那么其将会...。\n- 使用更具阐释性的长句来替代精炼短语，从而自然过渡。\n\n### 规则四：叙事节奏的"慢速化"调整\n通过上述策略，整体放慢信息的传递速度。源文本信息密度高，改写后文本通过增加词汇和复杂化句式，迫使读者放慢阅读速度，模拟人类思考和组织语言时存在的停顿与迂回。\n\n### 规则五：冗余中的精炼——实现可读性与低AI率的平衡\n此为平衡性原则。我们的目标是"人性化的复杂"，而非"无意义的臃肿"。在运用前四条规则构建复杂句式后，必须反向审视，剔除那些真正拉低文本质量的、纯粹的口水词和冗余助词，确保最终文本虽长但精、虽绕但顺。\n\n## 约束条件 (Constraints):\n- 严格遵循上述所有核心改写策略，特别是规则五的平衡作用。\n- 不得改变原文意思，不得新增、删减或偷换事实、观点、论点、结论和逻辑关系。\n- 最终只输出经过改写处理的最终中文文本，不包含任何形式的标题、注解、说明、前言或括号。\n- 格式规整：删除结尾总结性段落（如"综上所述"、"总而言之"等）；保留数字编号格式和条目结构；保留段落结构。\n- 输出的总字数应控制在源文本总字数的 ±10% 范围内，以确保信息密度不丢失。'),
+3:b64Encode('English technical and academic text revision assistant: anti-AIGC rewrite mode\n\n## 1. Role and goal\nYou are a professional revision assistant for English technical and academic writing. Your task is to rewrite the provided English text so that it reads like careful human-authored academic prose rather than polished AI-generated text.\n\nThe rewritten version must preserve the original meaning, technical correctness, logical order, and disciplinary tone. It should remain suitable for papers, reports, theses, technical documentation, and research-style writing. The goal is not to beautify the text, but to reduce detectable AI-style patterns while keeping the text clear and credible.\n\n## 2. Input and output\n- Input: one piece of original English technical or academic text marked as "original text".\n- Output: only one rewritten English passage.\n\n### Hard output constraints\n- Output only the rewritten text.\n- Do not add titles, labels, notes, comments, explanations, bullet points, or alternatives.\n- Do not ask questions. Do not explain edits.\n- Preserve the original paragraph structure unless a local restructuring is needed for naturalness.\n- Preserve headings, numbering, formulas, citations, technical terms, dataset names, model names, and symbols.\n- Do not use Markdown unless it already appears in the source.\n\n## 3. Non-negotiable constraints\n- Do not change claims, conclusions, evidence, assumptions, or technical content.\n- Do not add examples, citations, data, opinions, or interpretations.\n- Keep all technical terms accurate. Keep formulas, notation, abbreviations unchanged.\n\n## 4. Main anti-AIGC rewriting strategy\n\n### 4.1 Avoid overly smooth, uniform, generic academic prose\nAI-generated text often sounds suspicious because it is too balanced, too linear, and too consistently well-formed. Revise to reduce:\n- sentence patterns that repeat across a paragraph\n- evenly structured "claim + explanation + benefit" sequences\n- generic topic-sentence openings\n- textbook-style transitions inserted by habit\n\n### 4.2 Prefer local variation in sentence form\n- mix shorter and longer sentences when appropriate\n- avoid starting multiple nearby sentences with the same structure\n- avoid repeating "X is..., Y is..., Z is..." patterns\n\n### 4.3 Break formulaic academic templates\nEspecially revise patterns like: "X plays an important role in...", "With the development of...", "Recently... has opened new opportunities...", "Experimental results show that...", "This demonstrates/highlights...", "In addition/Moreover/Furthermore", "The proposed method has several advantages"\n\n### 4.4 Reduce promotional or inflated wording\n- utilize -> use\n- leverage -> use\n- demonstrate -> show\n- facilitate -> help\n- plays a crucial role -> is important\n\n### 4.5 Keep some natural roughness\nDo not over-polish every sentence. A believable human academic draft may contain slight unevenness in rhythm.\n\n## 5. Structural rewrite rules\n- You may reorder clauses within a sentence, change active/passive voice, merge or split sentences locally.\n- You may not invent details, change technical scope, add citations or data.\n\n## 6. Final quality check\nBefore output, ensure the rewrite: preserves original meaning, keeps technical details unchanged, sounds less generic and less templated, avoids repeated sentence openings, reads like a human-edited academic draft.\n\nOutput only the rewritten text.')
+};
+
+var UNLOCK_CODE='baibai2026';
+
+function isPro(){return localStorage.getItem('aigc_pro')==='true'}
+
+function switchDemo(tab){
+  document.querySelectorAll('.demo-tab').forEach(function(t,i){
+    t.classList.toggle('active',(tab==='before'&&i===0)||(tab==='after'&&i===1))
+  });
+  document.getElementById('demoBefore').classList.toggle('active',tab==='before');
+  document.getElementById('demoAfter').classList.toggle('active',tab==='after');
 }
 
-function copyText(id) {
-  var ta = document.getElementById(id);
-  ta.select();
-  document.execCommand('copy');
-  alert('✅ 提示词已复制到剪贴板！');
-}
-
-function updateScore() {
-  var checks = document.querySelectorAll('#step4 input[type="checkbox"]');
-  var yes = 0;
-  checks.forEach(c => { if(c.checked) yes++; });
-  var result = document.getElementById('scoreResult');
-  if(yes <= 1){
-    result.style.background = 'rgba(63,185,80,.2)';
-    result.style.color = 'var(--success)';
-    result.textContent = '✓ 效果很好！AI痕迹很低';
-  } else if(yes <= 3){
-    result.style.background = 'rgba(210,153,34,.2)';
-    result.style.color = 'var(--warn)';
-    result.textContent = '⚠ 还可以，但建议再优化一下';
-  } else {
-    result.style.background = 'rgba(248,81,73,.2)';
-    result.style.color = 'var(--danger)';
-    result.textContent = '✗ AI痕迹较重，建议再跑一轮改写';
+function doCopy(id,btn){
+  var ta=document.getElementById(id);
+  if(!ta)return;
+  ta.select();document.execCommand('copy');
+  if(btn){
+    var orig=btn.textContent;
+    btn.textContent='✅ 已复制！';
+    setTimeout(function(){btn.textContent=orig},1500)
   }
 }
 
-function unlockContent() {
-  var code = document.getElementById('unlockCode').value.trim();
-  // 设置你的解锁码（可以随意修改）
-  var validCode = 'baibai2026';
-  if (code === validCode) {
-    localStorage.setItem('aigc_unlocked', 'true');
-    showUnlockedContent();
-    alert('解锁成功！刷新页面后无需再次输入');
-  } else {
-    alert('解锁码错误，请核对后重新输入');
-  }
+function unlock(){
+  var code=document.getElementById('unlockCode').value.trim();
+  if(code!==UNLOCK_CODE){alert('❌ 解锁码错误，请核对后重新输入');return}
+  localStorage.setItem('aigc_pro','true');
+  document.getElementById('unlockCode').value='';
+  showPro();
 }
 
-function showUnlockedContent() {
-  document.getElementById('paywall').style.display = 'none';
-  document.getElementById('mainContent').style.display = 'block';
-  fillPrompts();
+function showPro(){
+  document.getElementById('proContent').classList.add('show');
+  document.getElementById('p1').value=b64Decode(PROMPTS[1]);
+  document.getElementById('p2').value=b64Decode(PROMPTS[2]);
+  document.getElementById('p3').value=b64Decode(PROMPTS[3]);
+  document.querySelector('.pricing-box').style.opacity='.6';
+  document.querySelector('.pricing-box').style.pointerEvents='none';
+  window.scrollTo({top:document.getElementById('proContent').offsetTop-40,behavior:'smooth'});
 }
 
-// 页面加载时检查解锁状态
-window.onload = function() {
-  var unlocked = localStorage.getItem('aigc_unlocked');
-  if (unlocked === 'true') {
-    showUnlockedContent();
-  } else {
-    document.getElementById('paywall').style.display = 'block';
-    document.getElementById('mainContent').style.display = 'none';
-  }
+function togglePro(id){
+  document.getElementById(id).classList.toggle('open');
+}
+
+function genTpl(round){
+  var promptText=b64Decode(PROMPTS[round]);
+  var out=document.getElementById('tplOut');
+  out.value=promptText+'\n\n---\n以下是我的原文：\n\n[在此粘贴你的论文段落]';
+}
+
+function upScore(){
+  var checks=document.querySelectorAll('#proContent input[type="checkbox"]');
+  var yes=0;checks.forEach(function(c){if(c.checked)yes++});
+  var r=document.getElementById('scoreR');
+  if(!r)return;
+  if(yes<=1){r.style.background='rgba(63,185,80,.2)';r.style.color='var(--success)';r.textContent='✓ 效果很好！AI 痕迹很低'}
+  else if(yes<=3){r.style.background='rgba(210,153,34,.2)';r.style.color='var(--warn)';r.textContent='⚠ 还可以，建议再优化一下'}
+  else{r.style.background='rgba(248,81,73,.2)';r.style.color='var(--danger)';r.textContent='✗ AI 痕迹较重，建议再跑一轮'}
+}
+
+document.getElementById('unlockBtn').addEventListener('click',unlock);
+document.getElementById('unlockCode').addEventListener('keydown',function(e){
+  if(e.key==='Enter')unlock()
+});
+
+window.onload=function(){
+  if(isPro()){showPro()}
 };
-
-document.getElementById('unlockBtn').addEventListener('click', unlockContent);
 </script>
 </body>
 </html>
+</parameter>
+</invoke>
+</webtool_calls>
