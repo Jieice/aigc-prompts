@@ -13,6 +13,11 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .header p{color:var(--text2);font-size:.95em}
 .header .tag{display:inline-block;background:var(--accent2);color:#fff;padding:3px 10px;border-radius:4px;font-size:.75em;margin-top:12px}
 .container{max-width:860px;margin:0 auto;padding:24px 16px}
+.model-quick{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px 16px;margin-bottom:20px;display:flex;flex-wrap:wrap;align-items:center;gap:12px;justify-content:space-between}
+.model-quick span{color:var(--text2);font-size:.85em}
+.model-links{display:flex;gap:12px;flex-wrap:wrap}
+.model-link{color:var(--accent);text-decoration:none;font-size:.85em;padding:4px 8px;border-radius:4px;background:rgba(88,166,255,.1);transition:background .15s}
+.model-link:hover{background:rgba(88,166,255,.2)}
 .step{background:var(--card);border:1px solid var(--border);border-radius:8px;margin-bottom:16px;overflow:hidden}
 .step-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;cursor:pointer}
 .step-header:hover{background:rgba(88,166,255,.05)}
@@ -23,7 +28,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .step-content{padding:0;display:none}
 .step.open .step-content{display:block;padding:20px}
 .prompt-area{background:#0d1117;border:1px solid var(--border);border-radius:6px;padding:16px;margin-bottom:12px;position:relative}
-.prompt-area textarea{width:100%;min-height:120px;background:transparent;border:none;color:var(--text);font-family:inherit;font-size:.9em;line-height:1.7;resize:vertical}
+.prompt-area textarea{width:100%;min-height:150px;background:transparent;border:none;color:var(--text);font-family:inherit;font-size:.9em;line-height:1.7;resize:vertical}
 .prompt-area textarea:focus{outline:none}
 .prompt-area textarea::placeholder{color:var(--text2)}
 .btn-row{display:flex;gap:8px;flex-wrap:wrap}
@@ -32,17 +37,9 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .btn-primary:hover{background:var(--accent)}
 .btn-secondary{background:var(--border);color:var(--text)}
 .btn-secondary:hover{background:#3d444d}
-.btn-success{background:var(--success);color:#fff}
 .tips{background:rgba(210,153,34,.1);border:1px solid rgba(210,153,34,.3);border-radius:6px;padding:12px 16px;margin-top:12px;font-size:.85em;color:var(--warn)}
 .tips strong{color:var(--warn)}
-.model-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-top:12px}
-.model-card{padding:12px;border:1px solid var(--border);border-radius:6px;text-align:center;cursor:pointer;transition:all .15s}
-.model-card:hover{border-color:var(--accent);background:rgba(88,166,255,.05)}
-.model-card.selected{border-color:var(--accent);background:rgba(88,166,255,.1)}
-.model-card .name{font-weight:600;font-size:.9em}
-.model-card .rank{font-size:.75em;color:var(--text2);margin-top:4px}
 .result-box{background:#0d1117;border:1px solid var(--border);border-radius:6px;padding:16px;margin-top:12px;min-height:100px;white-space:pre-wrap;font-size:.9em;line-height:1.8;color:var(--text)}
-.result-box:empty::before{content:"改写结果会显示在这里...";color:var(--text2)}
 .footer{padding:24px;text-align:center;color:var(--text2);font-size:.8em;border-top:1px solid var(--border);margin-top:40px}
 .footer a{color:var(--accent);text-decoration:none}
 @media(max-width:480px){.header h1{font-size:1.4em}.step-header{padding:12px 16px}.btn-row{flex-direction:column}.btn{width:100%;justify-content:center}}
@@ -57,41 +54,32 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 </div>
 
 <div class="container">
-
-  <div class="step open" id="step1">
-    <div class="step-header" onclick="toggleStep('step1')">
-      <div class="step-num">1</div>
-      <div class="step-title">选择AI模型</div>
-      <div class="step-arrow">▼</div>
-    </div>
-    <div class="step-content">
-      <p style="color:var(--text2);font-size:.9em;margin-bottom:8px">推荐效果排序，点击选择你用的模型：</p>
-      <div class="model-grid">
-        <div class="model-card selected" onclick="selectModel(this,'Claude')"><div class="name">Claude</div><div class="rank">效果最好</div></div>
-        <div class="model-card" onclick="selectModel(this,'GPT-4o')"><div class="name">GPT-4o</div><div class="rank">效果很好</div></div>
-        <div class="model-card" onclick="selectModel(this,'DeepSeek')"><div class="name">DeepSeek</div><div class="rank">性价比高</div></div>
-        <div class="model-card" onclick="selectModel(this,'Kimi')"><div class="name">Kimi</div><div class="rank">免费额度多</div></div>
-        <div class="model-card" onclick="selectModel(this,'豆包')"><div class="name">豆包</div><div class="rank">免费</div></div>
-        <div class="model-card" onclick="selectModel(this,'通义千问')"><div class="name">通义千问</div><div class="rank">免费</div></div>
-      </div>
-      <div class="tips"><strong>提示：</strong>预算有限选DeepSeek，免费选豆包或Kimi。不要用GPT-3.5，效果不够。</div>
+  
+  <div class="model-quick">
+    <span>🚀 常用AI模型直达：</span>
+    <div class="model-links">
+      <a href="https://claude.ai/" target="_blank" class="model-link">Claude</a>
+      <a href="https://chat.openai.com/" target="_blank" class="model-link">GPT-4o</a>
+      <a href="https://chat.deepseek.com/" target="_blank" class="model-link">DeepSeek</a>
+      <a href="https://kimi.moonshot.cn/" target="_blank" class="model-link">Kimi</a>
+      <a href="https://www.doubao.com/" target="_blank" class="model-link">豆包</a>
+      <a href="https://tongyi.aliyun.com/" target="_blank" class="model-link">通义千问</a>
     </div>
   </div>
 
-  <div class="step" id="step2">
+  <div class="step open" id="step2">
     <div class="step-header" onclick="toggleStep('step2')">
-      <div class="step-num">2</div>
+      <div class="step-num">1</div>
       <div class="step-title">第一轮：去书面化改写</div>
       <div class="step-arrow">▼</div>
     </div>
     <div class="step-content">
-      <p style="color:var(--text2);font-size:.9em;margin-bottom:12px">复制下面的提示词，粘贴到AI对话框，然后把你的论文贴在后面发送。</p>
+      <p style="color:var(--text2);font-size:.9em;margin-bottom:12px">复制下面的提示词，打开AI模型，粘贴后把论文附在后面发送。</p>
       <div class="prompt-area">
-        <textarea id="prompt1" placeholder="点击下方按钮加载提示词..."></textarea>
+        <textarea id="prompt1" readonly></textarea>
       </div>
       <div class="btn-row">
-        <button class="btn btn-primary" onclick="loadPrompt(1)">加载第一轮提示词</button>
-        <button class="btn btn-secondary" onclick="copyText('prompt1')">复制提示词</button>
+        <button class="btn btn-primary" onclick="copyText('prompt1')">📋 一键复制提示词</button>
       </div>
       <div class="tips"><strong>注意：</strong>论文太长（超过5000字）要分段处理，每段不超过850字。</div>
     </div>
@@ -99,20 +87,36 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 
   <div class="step" id="step3">
     <div class="step-header" onclick="toggleStep('step3')">
-      <div class="step-num">3</div>
+      <div class="step-num">2</div>
       <div class="step-title">第二轮：清AI套话改写</div>
       <div class="step-arrow">▼</div>
     </div>
     <div class="step-content">
       <p style="color:var(--text2);font-size:.9em;margin-bottom:12px">开一个新对话，复制下面的提示词，把第一轮改写的结果贴在后面发送。</p>
       <div class="prompt-area">
-        <textarea id="prompt2" placeholder="点击下方按钮加载提示词..."></textarea>
+        <textarea id="prompt2" readonly></textarea>
       </div>
       <div class="btn-row">
-        <button class="btn btn-primary" onclick="loadPrompt(2)">加载第二轮提示词</button>
-        <button class="btn btn-secondary" onclick="copyText('prompt2')">复制提示词</button>
+        <button class="btn btn-primary" onclick="copyText('prompt2')">📋 一键复制提示词</button>
       </div>
       <div class="tips"><strong>重要：</strong>两轮不能合并，必须分两步执行。第一轮的输出是第二轮的输入。</div>
+    </div>
+  </div>
+
+  <div class="step" id="step5">
+    <div class="step-header" onclick="toggleStep('step5')">
+      <div class="step-num">3</div>
+      <div class="step-title">英文论文？点这里</div>
+      <div class="step-arrow">▼</div>
+    </div>
+    <div class="step-content">
+      <p style="color:var(--text2);font-size:.9em;margin-bottom:12px">英文论文用这个单轮提示词，包含所有策略。</p>
+      <div class="prompt-area">
+        <textarea id="prompt3" readonly></textarea>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="copyText('prompt3')">📋 一键复制提示词</button>
+      </div>
     </div>
   </div>
 
@@ -136,24 +140,6 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
         <label style="display:block;margin-bottom:6px;cursor:pointer"><input type="checkbox" onchange="updateScore()"> 是否包含"本研究旨在"？</label>
       </div>
       <div id="scoreResult" style="margin-top:12px;padding:12px;border-radius:6px;font-weight:600"></div>
-    </div>
-  </div>
-
-  <div class="step" id="step5">
-    <div class="step-header" onclick="toggleStep('step5')">
-      <div class="step-num">5</div>
-      <div class="step-title">英文论文？点这里</div>
-      <div class="step-arrow">▼</div>
-    </div>
-    <div class="step-content">
-      <p style="color:var(--text2);font-size:.9em;margin-bottom:12px">英文论文用这个单轮提示词，包含所有策略。</p>
-      <div class="prompt-area">
-        <textarea id="prompt3" placeholder="点击下方按钮加载提示词..."></textarea>
-      </div>
-      <div class="btn-row">
-        <button class="btn btn-primary" onclick="loadPrompt(3)">加载英文版提示词</button>
-        <button class="btn btn-secondary" onclick="copyText('prompt3')">复制提示词</button>
-      </div>
     </div>
   </div>
 
@@ -556,40 +542,40 @@ Before producing the final text, ensure that the rewrite:
 
 Output only the rewritten text.`
 };
+
+window.onload = function() {
+  document.getElementById('prompt1').value = prompts[1];
+  document.getElementById('prompt2').value = prompts[2];
+  document.getElementById('prompt3').value = prompts[3];
+};
+
 function toggleStep(id){
-  var step=document.getElementById(id);
+  var step = document.getElementById(id);
   step.classList.toggle('open');
 }
-function loadPrompt(n){
-  document.getElementById('prompt'+n).value=prompts[n];
-}
 function copyText(id){
-  var ta=document.getElementById(id);
+  var ta = document.getElementById(id);
   ta.select();
   document.execCommand('copy');
-  alert('已复制到剪贴板');
-}
-function selectModel(el,name){
-  document.querySelectorAll('.model-card').forEach(c=>c.classList.remove('selected'));
-  el.classList.add('selected');
+  alert('✅ 提示词已复制到剪贴板！');
 }
 function updateScore(){
-  var checks=document.querySelectorAll('#step4 input[type="checkbox"]');
-  var yes=0;
-  checks.forEach(c=>{if(c.checked)yes++});
-  var result=document.getElementById('scoreResult');
-  if(yes<=1){
-    result.style.background='rgba(63,185,80,.2)';
-    result.style.color='var(--success)';
-    result.textContent='✓ 效果很好！AI痕迹很低';
-  }else if(yes<=3){
-    result.style.background='rgba(210,153,34,.2)';
-    result.style.color='var(--warn)';
-    result.textContent='⚠ 还可以，但建议再优化一下';
-  }else{
-    result.style.background='rgba(248,81,73,.2)';
-    result.style.color='var(--danger)';
-    result.textContent='✗ AI痕迹较重，建议再跑一轮改写';
+  var checks = document.querySelectorAll('#step4 input[type="checkbox"]');
+  var yes = 0;
+  checks.forEach(c => { if(c.checked) yes++; });
+  var result = document.getElementById('scoreResult');
+  if(yes <= 1){
+    result.style.background = 'rgba(63,185,80,.2)';
+    result.style.color = 'var(--success)';
+    result.textContent = '✓ 效果很好！AI痕迹很低';
+  } else if(yes <= 3){
+    result.style.background = 'rgba(210,153,34,.2)';
+    result.style.color = 'var(--warn)';
+    result.textContent = '⚠ 还可以，但建议再优化一下';
+  } else {
+    result.style.background = 'rgba(248,81,73,.2)';
+    result.style.color = 'var(--danger)';
+    result.textContent = '✗ AI痕迹较重，建议再跑一轮改写';
   }
 }
 </script>
